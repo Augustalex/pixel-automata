@@ -2,7 +2,7 @@ import {PixelDataView} from "@/utils/PixelDataView";
 import {useGameClock} from "@/gameState";
 
 export function SimulateStreams() {
-    const wavelength = .3;
+    const wavelength = .6;
     let offset = {x: -10000, y: 10000};
     const speedScale = 2;
     const time = useGameClock();
@@ -32,9 +32,8 @@ export function SimulateStreams() {
                     y: 100
                 });
                 const waveHeight = (wave1 + wave3) / 2;
-                const streamY = (steps / 2) + waveHeight * (steps / 2)
-                ;
-                if (nearbyLand.length >= 5) {
+                const streamY = (steps / 2) + waveHeight * (steps / 2);
+                if (nearbyLand.length >= 3) {
                     pixel.streamY = steps / 2 + (streamY / 2);
                 } else {
                     pixel.streamY = streamY;

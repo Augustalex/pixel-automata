@@ -190,8 +190,8 @@ function GenerateWorld(width, height) {
         for (let pixel of pixels) {
             if (pixel.pixelType === 'grass') {
                 if (Math.random() < .6) continue;
-                const wellTriggers = getTriggers(pixel, 8, isWellTrigger).length;
-                if (wellTriggers > 6) {
+                const wellTriggers = getTriggers(pixel, 5, isWellTrigger).length;
+                if (wellTriggers > 4) {
                     pixel.pixelType = 'water';
                     pixel.age = undefined;
                 }
@@ -200,20 +200,6 @@ function GenerateWorld(width, height) {
                 if (waterTriggers >= 8) {
                     pixel.pixelType = 'water';
                     pixel.age = undefined;
-                }
-            } else if (pixel.pixelType === 'water') {
-                const grassNextToHere = getTriggers(pixel, 6, isSimpleGrass).length;
-                const landTriggers = getTriggers(pixel, 4, isLandSource).length;
-
-                if (grassNextToHere > 8) {
-                    fromWaterToGrass(pixel);
-                } else {
-                    const grassNearby = getTriggers(pixel, 3, isSimpleGrass).length;
-                    // if (!grassNearby && landTriggers > 3) {
-                    //     fromWaterToGrass(pixel);
-                    // } else {
-                    //     pixel.variation = Math.min(10, grassNearby * 3);
-                    // }
                 }
             }
         }
@@ -228,7 +214,7 @@ function GenerateWorld(width, height) {
     }
 
     function isWellTrigger(pixel) {
-        return pixel.pixelType === 'grass' && pixel.variation > 2;
+        return pixel.pixelType === 'grass' && pixel.variation > 8;
     }
 
     function isLandSource(pixel) {
@@ -236,7 +222,7 @@ function GenerateWorld(width, height) {
     }
 
     function isWaterTrigger(pixel) {
-        return pixel.pixelType === 'water';
+        return pixel.pixelType === 'water' && pixel.variation > 5;
     }
 
     function isSimpleGrass(pixel) {
