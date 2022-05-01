@@ -1,18 +1,57 @@
+<script setup>
+import {Simulation, useGameState} from "@/gameState";
+import PixelTile from "@/components/pixel-tile";
+import {onMounted} from "vue";
+import PixelDrawer from "@/components/pixel-drawer";
+import {useMousePosition} from "@/useMousePosition";
+import GameCursor from "@/components/game-cursor";
+
+const gameState = useGameState();
+const mousePosition = useMousePosition();
+
+onMounted(() => {
+  const simulation = Simulation();
+  simulation.start();
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'p') {
+      if (simulation.isRunning()) {
+        simulation.stop();
+      } else {
+        simulation.start();
+      }
+    }
+  });
+
+  window.addEventListener('mousemove', e => {
+    mousePosition.x = e.clientX;
+    mousePosition.y = e.clientY;
+  });
+});
+
+</script>
+
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <game-cursor/>
+  <div class="playArea">
+    <pixel-drawer/>
+    <div class="grid">
+      <div v-for="(pixel, index) in gameState.pixels" :key="index">
+        <pixel-tile :pixel="pixel"/>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
+<style lang="scss" scoped>
+.playArea {
+  display: flex;
 }
-</script>
+
+.grid {
+  position: relative;
+}
+</style>
 
 <style lang="scss">
 #app {
