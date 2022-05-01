@@ -67,11 +67,11 @@ function getColor() {
   ];
   if (props.pixel.pixelType === 'water') {
     const saturationVariation = props.pixel.streamX;
-    const lightnessVariation = props.pixel.streamY;
+    const lightnessVariation = (props.pixel.streamY + props.pixel.streamX) / 2;
     return [
       applyVariation(190, 0, variation),
-      applyVariation(80, 1, saturationVariation),
-      applyVariation(60, 1.5, lightnessVariation),
+      applyVariation(80, 1, 0),
+      applyVariation(60, 1, lightnessVariation, 20),
       1
     ];
   }
@@ -84,8 +84,7 @@ function getColor() {
   return [0, 0, 0, 1];
 }
 
-function applyVariation(value, degree, variation) {
-  const MAX_VARIATION = 10;
+function applyVariation(value, degree, variation, MAX_VARIATION = 10) {
   const startColor = Math.max(value - degree * MAX_VARIATION, degree * MAX_VARIATION)
 
   return startColor + degree * variation;
