@@ -17,7 +17,6 @@ const title = computed(() => {
   const header = `${capitalize(props.pixel.pixelType)}`;
 
   if (props.pixel.pixelType === 'city') {
-    console.log('cities', cities.value, cities)
     const cityData = cities.value.get(props.pixel.cityId);
     if (!cityData) {
       return `Village`;
@@ -66,12 +65,16 @@ function getColor() {
     applyVariation(80, 1, variation),
     1
   ];
-  if (props.pixel.pixelType === 'water') return [
-    applyVariation(190, 0, variation),
-    applyVariation(80, 1, variation),
-    applyVariation(60, 1.5, variation),
-    1
-  ];
+  if (props.pixel.pixelType === 'water') {
+    const saturationVariation = props.pixel.streamX;
+    const lightnessVariation = props.pixel.streamY;
+    return [
+      applyVariation(190, 0, variation),
+      applyVariation(80, 1, saturationVariation),
+      applyVariation(60, 1.5, lightnessVariation),
+      1
+    ];
+  }
   if (props.pixel.pixelType === 'city') return [
     applyVariation(190, 0, 0),
     applyVariation(0, 0, 0),

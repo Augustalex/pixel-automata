@@ -1,5 +1,6 @@
 import {reactive, ref} from "vue";
 import {SimulateCities} from "@/systems/SimulateCities";
+import {SimulateStreams} from "@/systems/SimulateStreams";
 
 const WorldWidth = 42;
 const WorldHeight = 24;
@@ -60,7 +61,8 @@ function DefaultModules() {
     return [
         // SimulateGrassGrowth(),
         // SimulateGlobalWarming(),
-        SimulateCities()
+        SimulateCities(),
+        SimulateStreams()
     ];
 }
 
@@ -92,7 +94,7 @@ function SimulateGlobalWarming() {
     const gasOutput = 1;
 
     let amplitude = 10;
-    let deviationStrength= 10;
+    let deviationStrength = 10;
     let globalAverageTemperature = 10;
 
     const midX = _state.worldData.width * .5;
@@ -121,21 +123,17 @@ function SimulateGlobalWarming() {
                 if (pixel.temperature > 100) {
                     fromWaterToGrass(pixel);
                 }
-            }
-            else if(pixel.pixelType === 'grass') {
+            } else if (pixel.pixelType === 'grass') {
                 if (pixel.temperature < 0) {
                     fromGrassToIce(pixel);
-                }
-                else if(pixel.temperature > 200){
+                } else if (pixel.temperature > 200) {
                     fromGrassToDeadGrass(pixel);
                 }
-            }
-            else if(pixel.pixelType === 'dead-grass') {
+            } else if (pixel.pixelType === 'dead-grass') {
                 if (pixel.temperature < 0) {
                     fromDeadGrassToIce(pixel);
                 }
-            }
-            else if(pixel.pixelType === 'ice') {
+            } else if (pixel.pixelType === 'ice') {
                 if (pixel.temperature > 0) {
                     fromIceToWater(pixel);
                 }
@@ -187,34 +185,35 @@ function GenerateWorld(width, height) {
         }
     }
 
-    const passes = 50;
+    const passes = 2;
     for (let i = 0; i < passes; i++) {
         for (let pixel of pixels) {
             if (pixel.pixelType === 'grass') {
+                if (Math.random() < .6) continue;
                 const wellTriggers = getTriggers(pixel, 8, isWellTrigger).length;
                 if (wellTriggers > 6) {
                     pixel.pixelType = 'water';
                     pixel.age = undefined;
                 }
 
-                const waterTriggers = getTriggers(pixel, 8, isWaterTrigger).length;
+                const waterTriggers = getTriggers(pixel, 5, isWaterTrigger).length;
                 if (waterTriggers >= 8) {
                     pixel.pixelType = 'water';
                     pixel.age = undefined;
                 }
             } else if (pixel.pixelType === 'water') {
-                const grassNextToHere = getTriggers(pixel, 2, isSimpleGrass).length;
+                const grassNextToHere = getTriggers(pixel, 6, isSimpleGrass).length;
                 const landTriggers = getTriggers(pixel, 4, isLandSource).length;
 
-                if (grassNextToHere > 0) {
-                    fromWaterToGrass(pixel);
+                if (grassNextToHere > 8) {
+                    // fromWaterToGrass(pixel);
                 } else {
                     const grassNearby = getTriggers(pixel, 3, isSimpleGrass).length;
-                    if (!grassNearby && landTriggers > 3) {
-                        fromWaterToGrass(pixel);
-                    } else {
-                        pixel.variation = Math.min(10, grassNearby * 3);
-                    }
+                    // if (!grassNearby && landTriggers > 3) {
+                    //     fromWaterToGrass(pixel);
+                    // } else {
+                    //     pixel.variation = Math.min(10, grassNearby * 3);
+                    // }
                 }
             }
         }
@@ -229,7 +228,7 @@ function GenerateWorld(width, height) {
     }
 
     function isWellTrigger(pixel) {
-        return pixel.pixelType === 'grass'  && pixel.variation > 2;
+        return pixel.pixelType === 'grass' && pixel.variation > 2;
     }
 
     function isLandSource(pixel) {
@@ -237,7 +236,7 @@ function GenerateWorld(width, height) {
     }
 
     function isWaterTrigger(pixel) {
-        return pixel.pixelType === 'water' && pixel.variation > 8;
+        return pixel.pixelType === 'water';
     }
 
     function isSimpleGrass(pixel) {
@@ -263,6 +262,9 @@ function GenerateWorld(width, height) {
             variation: Math.round(Math.random() * 10),
             position: {x, y},
             age: 0,
+            streamX: 0,
+            streamY: 0,
+            velocity: {x: 0, y: 0},
         }
     }
 
