@@ -66,12 +66,11 @@ function getColor() {
     1
   ];
   if (props.pixel.pixelType === 'water') {
-    const saturationVariation = props.pixel.streamX;
-    const lightnessVariation = (props.pixel.streamY + props.pixel.streamX) / 2;
+    const lightnessVariation = (props.pixel.streamY); //tops out at 20
     return [
-      applyVariation(190, 0, variation),
-      applyVariation(80, 1, 0),
-      applyVariation(60, 1, lightnessVariation, 20),
+      190 - 5 + lightnessVariation * .5,
+      60,
+      38 + lightnessVariation * 1.8,
       1
     ];
   }
