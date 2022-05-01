@@ -185,7 +185,7 @@ function GenerateWorld(width, height) {
         }
     }
 
-    const passes = 2;
+    const passes = 20;
     for (let i = 0; i < passes; i++) {
         for (let pixel of pixels) {
             if (pixel.pixelType === 'grass') {
@@ -206,7 +206,7 @@ function GenerateWorld(width, height) {
                 const landTriggers = getTriggers(pixel, 4, isLandSource).length;
 
                 if (grassNextToHere > 8) {
-                    // fromWaterToGrass(pixel);
+                    fromWaterToGrass(pixel);
                 } else {
                     const grassNearby = getTriggers(pixel, 3, isSimpleGrass).length;
                     // if (!grassNearby && landTriggers > 3) {

@@ -69,8 +69,8 @@ function getColor() {
     const lightnessVariation = (props.pixel.streamY); //tops out at 20
     return [
       190 - 5 + lightnessVariation * .5,
-      60,
-      38 + lightnessVariation * 1.8,
+      80,
+      35 + lightnessVariation * 1,
       1
     ];
   }
