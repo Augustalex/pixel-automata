@@ -1,10 +1,11 @@
 <script setup>
 import {Simulation, useGameState} from "@/gameState";
 import PixelTile from "@/components/pixel-tile";
-import {onMounted} from "vue";
+import {computed, onMounted} from "vue";
 import PixelDrawer from "@/components/pixel-drawer";
 import {useMousePosition} from "@/useMousePosition";
 import GameCursor from "@/components/game-cursor";
+import GameInfo from "@/components/GameInfo";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
@@ -29,6 +30,11 @@ onMounted(() => {
   });
 });
 
+const css = computed(() => ({
+  gridWidth: `${gameState.worldData.width * gameState.worldData.tileSize}px`,
+  gridHeight: `${gameState.worldData.height * gameState.worldData.tileSize}px`,
+}));
+
 </script>
 
 <template>
@@ -40,6 +46,7 @@ onMounted(() => {
         <pixel-tile :pixel="pixel"/>
       </div>
     </div>
+    <game-info/>
   </div>
 </template>
 
@@ -50,6 +57,8 @@ onMounted(() => {
 
 .grid {
   position: relative;
+  width: v-bind('css.gridWidth');
+  height: v-bind('css.gridHeight');
 }
 </style>
 

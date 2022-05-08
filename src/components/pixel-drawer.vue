@@ -9,7 +9,10 @@ const tiles = [
     title: 'farm'
   },
   {
-    title: 'city'
+    title: 'zone-city'
+  },
+  {
+    title: 'humidifier'
   }
 ];
 

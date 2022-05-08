@@ -1,15 +1,23 @@
 import {reactive, ref} from "vue";
 import {SimulateCities} from "@/systems/SimulateCities";
 import {SimulateStreams} from "@/systems/SimulateStreams";
+import {SimulateHumidifiers} from "@/systems/SimulateHumidifiers";
+import {SimulateFarms} from "@/systems/SimulateFarms";
+import {ZoneSystem} from "@/systems/ZoneSystem";
 
-const WorldWidth = 42;
-const WorldHeight = 24;
+const WorldWidth = 62;
+const WorldHeight = 52;
+const TileSize = 24;
 
 const _gameClock = ref(0);
 const _state = reactive({
     worldData: {
+        tileSize: TileSize,
         width: WorldWidth,
         height: WorldHeight,
+    },
+    info: {
+        humidity: 0,
     },
     pixels: GenerateWorld(WorldWidth, WorldHeight)
 });
@@ -62,7 +70,10 @@ function DefaultModules() {
         // SimulateGrassGrowth(),
         // SimulateGlobalWarming(),
         SimulateCities(),
-        SimulateStreams()
+        SimulateStreams(),
+        SimulateHumidifiers(),
+        SimulateFarms(),
+        ZoneSystem()
     ];
 }
 
@@ -185,49 +196,20 @@ function GenerateWorld(width, height) {
         }
     }
 
-    const passes = 20;
+    const passes = 12;
     for (let i = 0; i < passes; i++) {
         for (let pixel of pixels) {
-            if (pixel.pixelType === 'grass') {
-                if (Math.random() < .6) continue;
-                const wellTriggers = getTriggers(pixel, 5, isWellTrigger).length;
-                if (wellTriggers > 4) {
-                    pixel.pixelType = 'water';
-                    pixel.age = undefined;
-                }
-
-                const waterTriggers = getTriggers(pixel, 5, isWaterTrigger).length;
-                if (waterTriggers >= 8) {
-                    pixel.pixelType = 'water';
-                    pixel.age = undefined;
-                }
+            if (pixel.pixelType === 'sand') {
+                if (Math.random() < .3) continue;
+                if ((pixel.height > 7 || pixel.height < 2) && Math.random() > .3) continue;
+                const neighbours = getPixelsInRadius(pixel, 4);
+                const newHeight = Math.round(neighbours.reduce((acc, v) => acc + v.height, 0) / neighbours.length);
+                pixel.height = newHeight;
             }
         }
     }
 
     return pixels;
-
-    function getTriggers(pixel, radius, checkFn) {
-        return getNeighbours(pixel.position.x, pixel.position.y, radius)
-            .map(key => pixelMap.get(key))
-            .filter(p => p && checkFn(p));
-    }
-
-    function isWellTrigger(pixel) {
-        return pixel.pixelType === 'grass' && pixel.variation > 8;
-    }
-
-    function isLandSource(pixel) {
-        return pixel.pixelType === 'water' && pixel.variation > 5;
-    }
-
-    function isWaterTrigger(pixel) {
-        return pixel.pixelType === 'water' && pixel.variation > 5;
-    }
-
-    function isSimpleGrass(pixel) {
-        return pixel.pixelType === 'grass';
-    }
 
     function getNeighbours(ox, oy, diameter) {
         const n = [];
@@ -242,21 +224,22 @@ function GenerateWorld(width, height) {
         return n;
     }
 
-    function GeneratePixel(x, y) {
-        return {
-            pixelType: 'grass',
-            variation: Math.round(Math.random() * 10),
-            position: {x, y},
-            age: 0,
-            streamX: 0,
-            streamY: 0,
-            velocity: {x: 0, y: 0},
-        }
+    function getPixelsInRadius(pixel, radius) {
+        return getNeighbours(pixel.position.x, pixel.position.y, radius)
+            .map(key => pixelMap.get(key))
+            .filter(p => !!p);
     }
 
-    function fromWaterToGrass(pixel) {
-        pixel.pixelType = 'grass';
-        pixel.age = 0;
+    function GeneratePixel(x, y) {
+        return {
+            pixelType: 'sand',
+            variation: Math.round(Math.random() * 10),
+            height: Math.round(Math.random() * 10),
+            position: {x, y},
+            age: 0,
+            streamY: 0,
+            surface: 'smooth'
+        }
     }
 
     function key(pixel) {

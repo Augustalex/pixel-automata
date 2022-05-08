@@ -12,7 +12,6 @@ const css = computed(() => ({
 }));
 
 function onClick() {
-  console.log('click', props.tile.title)
   cursor.setHoldingItem(props.tile.title);
 }
 

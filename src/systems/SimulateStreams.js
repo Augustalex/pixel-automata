@@ -9,11 +9,17 @@ export function SimulateStreams() {
 
     let flow = {x: 0, y: 0};
 
+    let pacing = 0;
+
     return {
         run
     };
 
     function run({delta, pixels}) {
+        pacing += delta;
+        if (pacing < .5) return;
+        pacing = 0;
+
         const view = PixelDataView(pixels);
 
         const steps = 20;

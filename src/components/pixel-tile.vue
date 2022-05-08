@@ -2,6 +2,7 @@
 import {computed} from "vue";
 import {useGridController} from "@/gridController";
 import {useCities} from "@/utils/Cities";
+import {getTileColor} from "@/utils/tileColor";
 
 const gridController = useGridController();
 const cities = useCities();
@@ -9,9 +10,9 @@ const cities = useCities();
 const props = defineProps({
   pixel: Object
 })
-const tileSize = 24;
+const tileSize = 24; // Keep in sync with gameState tileSize constant
 
-const color = computed(() => diffuse(getColor(), 1));
+const color = computed(() => darken(diffuse(getTileColor(props.pixel), 1), ((props.pixel.height) / 40) + .75));
 
 const title = computed(() => {
   const header = `${capitalize(props.pixel.pixelType)}`;
@@ -24,7 +25,7 @@ const title = computed(() => {
       return `${header}\nLevel ${cityData.maxLevel}\nPopulation ${cityData.population}k`;
     }
   }
-  return `${header} ${props.pixel.variation} ${props.pixel.temperature || ''}`;
+  return `${header} ${props.pixel.height} ${props.pixel.temperature || ''}`;
 });
 
 const css = computed(() => ({
@@ -39,50 +40,6 @@ function capitalize(text) {
   return `${text.substring(0, 1).toUpperCase()}${text.substring(1)}`;
 }
 
-function getColor() {
-  const variation = props.pixel.variation;
-  if (props.pixel.pixelType === 'grass') return [
-    applyVariation(120, 0, variation),
-    applyVariation(70, 1, variation),
-    applyVariation(76, 1, variation),
-    1
-  ];
-  if (props.pixel.pixelType === 'ice') return [
-    applyVariation(120, 0, variation),
-    applyVariation(10, 2, variation),
-    applyVariation(100, .5, variation),
-    1
-  ];
-  if (props.pixel.pixelType === 'dead-grass') return [
-    applyVariation(60, 0, variation),
-    applyVariation(90, 2, variation),
-    applyVariation(80, 1, variation),
-    1
-  ];
-  if (props.pixel.pixelType === 'farm') return [
-    applyVariation(60, 0, variation),
-    applyVariation(90, 2, variation),
-    applyVariation(80, 1, variation),
-    1
-  ];
-  if (props.pixel.pixelType === 'water') {
-    const lightnessVariation = (props.pixel.streamY); //tops out at 20
-    return [
-      190 - 5 + lightnessVariation * .5,
-      80,
-      35 + lightnessVariation * 1,
-      1
-    ];
-  }
-  if (props.pixel.pixelType === 'city') return [
-    applyVariation(190, 0, 0),
-    applyVariation(0, 0, 0),
-    applyVariation(50, 5, 10 - props.pixel.cityLevel),
-    1
-  ];
-  return [0, 0, 0, 1];
-}
-
 function applyVariation(value, degree, variation, MAX_VARIATION = 10) {
   const startColor = Math.max(value - degree * MAX_VARIATION, degree * MAX_VARIATION)
 
@@ -93,6 +50,10 @@ function diffuse([red, green, blue, alpha = 1], factor) {
   return [red, green, blue, alpha * factor];
 }
 
+function darken([hue, saturation, lightness, alpha = 1], factor) {
+  return [hue, saturation, lightness * factor, alpha];
+}
+
 function colorToCss(color) {
   const [hue, saturation, lightness, alpha = 1] = color;
   return `hsla(${hue},${saturation}%,${lightness}%,${alpha})`;
@@ -100,7 +61,8 @@ function colorToCss(color) {
 </script>
 
 <template>
-  <div class="tile" :title="title" @click="gridController.onTileClicked(props.pixel)">
+  <div class="tile" :title="title" @click="gridController.onTileClicked(props.pixel)"
+       @click.right.prevent="gridController.onCancel">
   </div>
 </template>
 
