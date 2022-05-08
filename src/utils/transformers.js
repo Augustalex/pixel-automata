@@ -24,6 +24,9 @@ function getTransformer(pixel, toType) {
         if (toType === 'humidifier') {
             return fromGrassToHumidifier;
         }
+        if (toType === 'road') {
+            return fromAnyToRoad;
+        }
     } else if (pixel.pixelType === 'sand') {
         if (toType === 'humidifier') {
             return fromGrassToHumidifier;
@@ -33,6 +36,9 @@ function getTransformer(pixel, toType) {
         }
         if (toType === 'water') {
             return () => standardTransform(pixel, 'water');
+        }
+        if (toType === 'road') {
+            return fromAnyToRoad;
         }
     } else if (pixel.pixelType === 'humidifier') {
         if (toType === 'water') {
@@ -49,6 +55,11 @@ function getTransformer(pixel, toType) {
         if (toType === 'zone') {
             return fromCityToZone;
         }
+        if (toType === 'grass') {
+            return () => standardTransform(pixel, toType);
+        }
+    } else if (pixel.pixelType === 'road') {
+        return () => standardTransform(pixel, toType);
     }
 
     throw new Error('No implementation of transformer from ' + pixel.pixelType + ' to ' + toType);
@@ -114,4 +125,10 @@ function fromGrassToWater(pixel) {
 function fromCityToZone(pixel) {
     pixel.pixelType = 'zone';
     pixel.zoneType = 'city';
+}
+
+function fromAnyToRoad(pixel) {
+    pixel.roadSurface = pixel.pixelType;
+
+    standardTransform(pixel, 'road');
 }

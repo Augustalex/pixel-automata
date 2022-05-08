@@ -51,6 +51,12 @@ export function getTileColor(pixel) {
         applyVariation(50, 5, 10 - pixel.cityLevel),
         1
     ];
+    if (pixel.pixelType === 'road') return [
+        applyVariation(190, 0, 0),
+        10,
+        5 + variation * 1,
+        1
+    ];
     if (pixel.pixelType === 'humidifier') {
         const height = pixel.height * 5 + 20;
         return [

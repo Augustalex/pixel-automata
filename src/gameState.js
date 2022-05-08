@@ -4,10 +4,10 @@ import {SimulateStreams} from "@/systems/SimulateStreams";
 import {SimulateHumidifiers} from "@/systems/SimulateHumidifiers";
 import {SimulateFarms} from "@/systems/SimulateFarms";
 import {ZoneSystem} from "@/systems/ZoneSystem";
+import {TileSize} from "@/utils/constants";
 
-const WorldWidth = 62;
-const WorldHeight = 52;
-const TileSize = 24;
+const WorldWidth = 42;
+const WorldHeight = 32;
 
 const _gameClock = ref(0);
 const _state = reactive({

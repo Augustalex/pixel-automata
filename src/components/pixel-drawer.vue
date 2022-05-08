@@ -13,6 +13,15 @@ const tiles = [
   },
   {
     title: 'humidifier'
+  },
+  {
+    title: 'road'
+  },
+  {
+    title: 'dig'
+  },
+  {
+    title: 'raise'
   }
 ];
 

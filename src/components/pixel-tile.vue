@@ -3,6 +3,7 @@ import {computed} from "vue";
 import {useGridController} from "@/gridController";
 import {useCities} from "@/utils/Cities";
 import {getTileColor} from "@/utils/tileColor";
+import {TileSize} from "@/utils/constants";
 
 const gridController = useGridController();
 const cities = useCities();
@@ -10,7 +11,7 @@ const cities = useCities();
 const props = defineProps({
   pixel: Object
 })
-const tileSize = 24; // Keep in sync with gameState tileSize constant
+const tileSize = TileSize;
 
 const color = computed(() => darken(diffuse(getTileColor(props.pixel), 1), ((props.pixel.height) / 40) + .75));
 
@@ -58,11 +59,17 @@ function colorToCss(color) {
   const [hue, saturation, lightness, alpha = 1] = color;
   return `hsla(${hue},${saturation}%,${lightness}%,${alpha})`;
 }
+
+function onMouseOver(event) {
+  if (event.buttons === 1) {
+    gridController.onTileClicked(props.pixel);
+  }
+}
 </script>
 
 <template>
-  <div class="tile" :title="title" @click="gridController.onTileClicked(props.pixel)"
-       @click.right.prevent="gridController.onCancel">
+  <div class="tile" :title="title" @mouseover="onMouseOver" @mousedown="gridController.onTileClicked(props.pixel)"
+       @click.right.prevent="gridController.onCancel(props.pixel)">
   </div>
 </template>
 

@@ -23,7 +23,7 @@ export function PixelDataView(pixels) {
     function getNeighbours(pixel, radius, checkFn) {
         return _getNeighbours(pixel.position.x, pixel.position.y, radius)
             .map(key => pixelMap.get(key))
-            .filter(p => p && checkFn(p));
+            .filter(p => p && p !== pixel && checkFn(p));
     }
 
     function getNeighboursCircular(pixel, radius, checkFn) {
