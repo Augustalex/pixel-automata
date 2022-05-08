@@ -29,10 +29,6 @@ export function SimulateStreams() {
                 const nearbyLand = view.getNeighbours(pixel, 3, p => p.pixelType === 'grass');
 
                 const wave1 = height(pixel.position.x, pixel.position.y, wavelength, offset);
-                const wave2 = height(pixel.position.x, pixel.position.y, wavelength / 2, {
-                    x: 0,
-                    y: 0
-                });
                 const wave3 = height(pixel.position.x, pixel.position.y, wavelength / 4, {
                     x: 100,
                     y: 100

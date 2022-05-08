@@ -13,7 +13,7 @@ export function SimulateHumidifiers() {
 
     function run({delta, pixels}) {
         pacing += delta;
-        if (pacing < 1) return;
+        if (pacing < .75) return;
         pacing = 0;
 
         const view = PixelDataView(pixels);
