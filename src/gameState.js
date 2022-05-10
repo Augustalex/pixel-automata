@@ -230,7 +230,8 @@ function GenerateWorld(width, height) {
         const endRadius = Math.ceil(diameter / 2) - 1;
         for (let y = oy - startRadius; y <= oy + endRadius; y++) {
             for (let x = ox - startRadius; x <= ox + endRadius; x++) {
-                n.push(`${x}:${y}`);
+                const wrappedX = x < 0 ? (WorldWidth + x) : x % WorldWidth;
+                n.push(`${wrappedX}:${y}`);
             }
         }
 
@@ -244,16 +245,10 @@ function GenerateWorld(width, height) {
     }
 
     function GeneratePixel(x, y) {
-        const middleX = WorldWidth / 2;
-        const middleY = WorldHeight / 2;
-        const distance = Math.abs(Math.sqrt(Math.pow(x - middleX, 2) + Math.pow(y - middleY, 2)));
-        // const isSpace = distance > Math.min(WorldHeight, WorldWidth) * .5;
-        const isSpace = false;
-
         return {
-            pixelType: isSpace ? 'space' : 'sand',
+            pixelType: 'sand',
             variation: Math.round(Math.random() * 10),
-            height:  Math.round(Math.random() * 10),
+            height: Math.round(Math.random() * 10),
             position: {x, y},
             age: 0,
             streamY: 0,

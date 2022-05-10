@@ -60,6 +60,10 @@ onMounted(() => {
 
     lastX.value = offsetX;
     lastY.value = offsetY;
+
+    if (e.buttons === 1) {
+      gridController.onTileClicked(lastTile.value);
+    }
   });
 
   canvas.addEventListener('mousedown', (e) => {

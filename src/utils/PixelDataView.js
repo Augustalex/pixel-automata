@@ -1,3 +1,5 @@
+import {TileSize, WorldWidth} from "@/utils/constants";
+
 export function PixelDataView(pixels) {
     const pixelMap = new Map();
     const countByType = new Map();
@@ -38,7 +40,8 @@ export function PixelDataView(pixels) {
         const endRadius = Math.ceil(diameter / 2) - 1;
         for (let y = oy - startRadius; y <= oy + endRadius; y++) {
             for (let x = ox - startRadius; x <= ox + endRadius; x++) {
-                n.push(`${x}:${y}`);
+                const wrappedX = x < 0 ? (WorldWidth + x) : x % WorldWidth;
+                n.push(`${wrappedX}:${y}`);
             }
         }
 
@@ -54,8 +57,9 @@ export function PixelDataView(pixels) {
         for (let y = oy - startRadius; y <= oy + endRadius; y++) {
             for (let x = ox - startRadius; x <= ox + endRadius; x++) {
                 const distance = Math.abs(Math.pow(x - ox, 2) + Math.pow(y - oy, 2));
+                const wrappedX = x < 0 ? (WorldWidth + x) : x % WorldWidth;
                 if (distance < maxDistance) {
-                    n.push(`${x}:${y}`);
+                    n.push(`${wrappedX}:${y}`);
                 }
             }
         }
