@@ -4,10 +4,7 @@ import {SimulateStreams} from "@/systems/SimulateStreams";
 import {SimulateHumidifiers} from "@/systems/SimulateHumidifiers";
 import {SimulateFarms} from "@/systems/SimulateFarms";
 import {ZoneSystem} from "@/systems/ZoneSystem";
-import {TileSize} from "@/utils/constants";
-
-const WorldWidth = 42;
-const WorldHeight = 32;
+import {TileSize, WorldHeight, WorldWidth} from "@/utils/constants";
 
 const _gameClock = ref(0);
 const _state = reactive({
@@ -25,6 +22,17 @@ const _state = reactive({
 export const useGameClock = () => _gameClock;
 export const useGameState = () => _state;
 
+const frameTimeBuffer = [];
+
+window.fpsCounter = () => {
+    setInterval(() => {
+        if (frameTimeBuffer.length === 0) return;
+
+        const cycleTime = frameTimeBuffer.reduce((acc, v) => acc + v, 0) / frameTimeBuffer.length;
+        console.log(1000 / cycleTime);
+    }, 800);
+}
+
 export function Simulation({modules} = {modules: DefaultModules()}) {
     let timeoutId;
 
@@ -38,6 +46,7 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
         let previousTime = Date.now();
 
         const loop = () => {
+            const start = performance.now();
             const currentTime = Date.now();
             const delta = (currentTime - previousTime) / 1000;
             _gameClock.value = (_gameClock.value + delta);
@@ -47,6 +56,10 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
             for (let module of modules) {
                 module.run(moduleProps);
             }
+
+            frameTimeBuffer.push(performance.now() - start);
+
+            if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
 
             previousTime = currentTime;
             timeoutId = setTimeout(loop, 250);
@@ -231,14 +244,20 @@ function GenerateWorld(width, height) {
     }
 
     function GeneratePixel(x, y) {
+        const middleX = WorldWidth / 2;
+        const middleY = WorldHeight / 2;
+        const distance = Math.abs(Math.sqrt(Math.pow(x - middleX, 2) + Math.pow(y - middleY, 2)));
+        // const isSpace = distance > Math.min(WorldHeight, WorldWidth) * .5;
+        const isSpace = false;
+
         return {
-            pixelType: 'sand',
+            pixelType: isSpace ? 'space' : 'sand',
             variation: Math.round(Math.random() * 10),
-            height: Math.round(Math.random() * 10),
+            height:  Math.round(Math.random() * 10),
             position: {x, y},
             age: 0,
             streamY: 0,
-            surface: 'smooth'
+            surface: 'smooth',
         }
     }
 

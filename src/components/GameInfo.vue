@@ -16,8 +16,13 @@ const population = computed(() => {
 });
 </script>
 <template>
-  <div>
+  <divc class="info">
     <h1>HUMIDITY: {{ humidity }}%</h1>
     <h1>POPULATION: {{ population }}</h1>
-  </div>
+  </divc>
 </template>
+<style scoped>
+.info {
+  margin-left: 45px;
+}
+</style>

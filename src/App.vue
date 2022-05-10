@@ -1,14 +1,19 @@
 <script setup>
 import {Simulation, useGameState} from "@/gameState";
 import PixelTile from "@/components/pixel-tile";
-import {computed, onMounted} from "vue";
+import {computed, onMounted, ref} from "vue";
 import PixelDrawer from "@/components/pixel-drawer";
 import {useMousePosition} from "@/useMousePosition";
 import GameCursor from "@/components/game-cursor";
 import GameInfo from "@/components/GameInfo";
+import Stars from "@/components/BackgroundStars";
+import BackgroundStars from "@/components/BackgroundStars";
+import PlanetRenderer from "@/components/PlanetRenderer";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
+
+const offsetX = ref(20);
 
 onMounted(() => {
   const simulation = Simulation();
@@ -28,6 +33,20 @@ onMounted(() => {
     mousePosition.x = e.clientX;
     mousePosition.y = e.clientY;
   });
+
+  let lastNow = Date.now();
+  const planetRotationLoop = () => {
+    const now = Date.now();
+    const delta = (now - lastNow) / 1000;
+
+    offsetX.value += delta * 10;
+
+    lastNow = now;
+
+    requestAnimationFrame(planetRotationLoop);
+  }
+
+  planetRotationLoop();
 });
 
 const css = computed(() => ({
@@ -38,27 +57,32 @@ const css = computed(() => ({
 </script>
 
 <template>
-  <game-cursor/>
+  <background-stars/>
+<!--  <game-cursor/>-->
   <div class="playArea">
     <pixel-drawer/>
-    <div class="grid">
-      <div v-for="(pixel, index) in gameState.pixels" :key="index">
-        <pixel-tile :pixel="pixel"/>
-      </div>
-    </div>
+    <planet-renderer/>
+<!--    <div class="grid">-->
+<!--      <pixel-tile v-for="(pixel, index) in gameState.pixels" :key="index" :pixel="pixel" :offsetX="offsetX"/>-->
+<!--    </div>-->
     <game-info/>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .playArea {
+  align-items: center;
+  justify-content: center;
   display: flex;
+  margin-bottom: 200px;
 }
 
 .grid {
   position: relative;
   width: v-bind('css.gridWidth');
   height: v-bind('css.gridHeight');
+  overflow: hidden;
+  border-radius: 50%;
 }
 </style>
 
@@ -70,5 +94,10 @@ const css = computed(() => ({
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+html, body {
+  margin: 0;
+  background: #191e24;
 }
 </style>

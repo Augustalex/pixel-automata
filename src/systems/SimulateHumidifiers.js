@@ -13,7 +13,7 @@ export function SimulateHumidifiers() {
 
     function run({delta, pixels}) {
         pacing += delta;
-        if (pacing < .75) return;
+        if (pacing < .25) return;
         pacing = 0;
 
         const view = PixelDataView(pixels);
@@ -47,7 +47,7 @@ export function SimulateHumidifiers() {
         const toMakeWater = [];
         const waterLevel = Math.round(gameState.info.humidity * 10) - 1;
         for (let pixel of pixels) {
-            if (pixel.height <= waterLevel && pixel.pixelType !== 'water') {
+            if (pixel.height <= waterLevel && pixel.pixelType !== 'water' && pixel.pixelType !== 'space') {
                 const nearbyWater = view.getNeighbours(pixel, 3, p => p.pixelType === 'water');
                 if (pixel.height === 0 || nearbyWater.length > 0) {
                     toMakeWater.push(pixel);

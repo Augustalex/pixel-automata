@@ -94,7 +94,7 @@ export function SimulateCities() {
         for (let toGrass of toMakeGrass) {
             if (Math.random() > .5) continue;
             if (toGrass.pixelType !== 'city') continue;
-            transform(toGrass, 'grass');
+            transform(toGrass, 'zone');
 
             const cities = view.getNeighbours(toGrass, 3, p => 'city' === p.pixelType);
             for (let city of cities) {

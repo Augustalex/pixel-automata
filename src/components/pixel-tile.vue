@@ -3,15 +3,18 @@ import {computed} from "vue";
 import {useGridController} from "@/gridController";
 import {useCities} from "@/utils/Cities";
 import {getTileColor} from "@/utils/tileColor";
-import {TileSize} from "@/utils/constants";
+import {TileSize, WorldWidth} from "@/utils/constants";
 
 const gridController = useGridController();
 const cities = useCities();
 
-const props = defineProps({
-  pixel: Object
-})
 const tileSize = TileSize;
+const worldLength = WorldWidth * tileSize;
+
+const props = defineProps({
+  pixel: Object,
+  offsetX: Number
+})
 
 const color = computed(() => darken(diffuse(getTileColor(props.pixel), 1), ((props.pixel.height) / 40) + .75));
 
@@ -31,7 +34,7 @@ const title = computed(() => {
 
 const css = computed(() => ({
   size: `${tileSize}px`,
-  left: `${props.pixel.position.x * tileSize}px`,
+  left: `${(props.pixel.position.x * tileSize + props.offsetX) % worldLength}px`,
   top: `${props.pixel.position.y * tileSize}px`,
   border: `1px solid ${colorToCss(diffuse(color.value, .5))}`,
   background: colorToCss(color.value)
@@ -68,12 +71,14 @@ function onMouseOver(event) {
 </script>
 
 <template>
-  <div class="tile" :title="title" @mouseover="onMouseOver" @mousedown="gridController.onTileClicked(props.pixel)"
+  <div v-if="props.pixel.pixelType === 'space'" class="tile tile--space"/>
+  <div v-else class="tile" :title="title" @mouseover="onMouseOver"
+       @mousedown="gridController.onTileClicked(props.pixel)"
        @click.right.prevent="gridController.onCancel(props.pixel)">
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .tile {
   width: v-bind('css.size');
   height: v-bind('css.size');
@@ -84,5 +89,11 @@ function onMouseOver(event) {
   position: absolute;
   left: v-bind('css.left');
   top: v-bind('css.top');
+  user-select: none;
+}
+
+.tile--space {
+  background: transparent;
+  border: none;
 }
 </style>

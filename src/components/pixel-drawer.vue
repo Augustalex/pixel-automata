@@ -28,10 +28,15 @@ const tiles = [
 </script>
 
 <template>
-  <div>
+  <div class="drawer">
     <pixel-icon v-for="tile in tiles" :key="tile.title" :tile="tile"/>
   </div>
 </template>
 
 <style scoped>
+.drawer {
+  margin-right: 45px;
+  z-index: 2;
+  position: relative;
+}
 </style>
