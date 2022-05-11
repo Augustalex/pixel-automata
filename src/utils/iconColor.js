@@ -6,9 +6,9 @@ export function iconColor(tileInfo) {
         1
     ];
     if (tileInfo.title === 'farm') return [
-        60,
-        90,
         50,
+        85,
+        55,
         1
     ];
     if (tileInfo.title === 'zone-city') return [
@@ -24,15 +24,15 @@ export function iconColor(tileInfo) {
         1
     ];
     if (tileInfo.title === 'dig') return [
-        350,
-        0,
-        20,
+        27,
+        50,
+        10,
         1
     ];
     if (tileInfo.title === 'raise') return [
-        350,
-        0,
-        90,
+        27,
+        60,
+        60,
         1
     ];
     return [0, 0, 0, 1];

@@ -16,13 +16,27 @@ const population = computed(() => {
 });
 </script>
 <template>
-  <divc class="info">
-    <h1>HUMIDITY: {{ humidity }}%</h1>
-    <h1>POPULATION: {{ population }}</h1>
-  </divc>
+  <div class="info">
+    <div class="textContainer">
+      <h1>HUMIDITY<br>{{ humidity }}%</h1>
+      <h1>POPULATION<br>{{ population }}</h1>
+    </div>
+  </div>
 </template>
 <style scoped>
 .info {
-  margin-left: 45px;
+  position: relative;
+}
+
+.textContainer {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  text-align: center;
+}
+
+h1 {
+  font-size: 1.4em;
 }
 </style>

@@ -2,41 +2,72 @@
 import PixelIcon from "@/components/pixel-icon";
 
 const tiles = [
+  // {
+  //   title: 'grass'
+  // },
   {
-    title: 'grass'
+    title: 'humidifier',
+    displayTitle: 'Humidifier'
   },
   {
-    title: 'farm'
+    title: 'farm',
+    displayTitle: 'Farm'
   },
   {
-    title: 'zone-city'
+    title: 'road',
+    displayTitle: 'Road'
   },
   {
-    title: 'humidifier'
+    title: 'zone-city',
+    displayTitle: 'City'
   },
   {
-    title: 'road'
+    title: 'dig',
+    displayTitle: 'Dig'
   },
   {
-    title: 'dig'
-  },
-  {
-    title: 'raise'
+    title: 'raise',
+    displayTitle: 'Raise'
   }
 ];
 
 </script>
 
 <template>
-  <div class="drawer">
-    <pixel-icon v-for="tile in tiles" :key="tile.title" :tile="tile"/>
+  <div class="drawer-container">
+    <div class="drawer">
+      <pixel-icon v-for="tile in tiles" :key="tile.title" :tile="tile" class="drawer-icon"/>
+    </div>
   </div>
 </template>
 
-<style scoped>
-.drawer {
-  margin-right: 45px;
+<style scoped lang="scss">
+.drawer-container {
   z-index: 2;
   position: relative;
+  overflow: hidden;
+}
+
+.drawer {
+  opacity: .05;
+  padding: 90px;
+  margin: -90px;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  transition: opacity .2s ease-in;
+}
+
+.drawer-icon {
+  opacity: .6;
+
+  &:hover {
+    cursor: pointer;
+    opacity: 1;
+  }
+
+  transition: opacity .05s ease-out;
 }
 </style>

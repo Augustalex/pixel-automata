@@ -1,103 +1,51 @@
 <script setup>
-import {Simulation, useGameState} from "@/gameState";
-import PixelTile from "@/components/pixel-tile";
-import {computed, onMounted, ref} from "vue";
-import PixelDrawer from "@/components/pixel-drawer";
-import {useMousePosition} from "@/useMousePosition";
-import GameCursor from "@/components/game-cursor";
-import GameInfo from "@/components/GameInfo";
-import Stars from "@/components/BackgroundStars";
-import BackgroundStars from "@/components/BackgroundStars";
-import PlanetRenderer from "@/components/PlanetRenderer";
+import {useView} from "@/utils/useView";
 
-const gameState = useGameState();
-const mousePosition = useMousePosition();
+const view = useView();
 
-const offsetX = ref(20);
+import MainMenu from "@/components/MainMenu";
+import PlayGame from "@/components/PlayGame";
+import {onBeforeUnmount, onMounted, ref} from "vue";
+
+const audio = ref(null);
 
 onMounted(() => {
-  const simulation = Simulation();
-  simulation.start();
-
-  window.addEventListener('keydown', e => {
-    if (e.key === 'p') {
-      if (simulation.isRunning()) {
-        simulation.stop();
-      } else {
-        simulation.start();
-      }
-    }
-  });
-
-  window.addEventListener('mousemove', e => {
-    mousePosition.x = e.clientX;
-    mousePosition.y = e.clientY;
-  });
-
-  let lastNow = Date.now();
-  const planetRotationLoop = () => {
-    const now = Date.now();
-    const delta = (now - lastNow) / 1000;
-
-    offsetX.value += delta * 10;
-
-    lastNow = now;
-
-    requestAnimationFrame(planetRotationLoop);
-  }
-
-  planetRotationLoop();
+  window.addEventListener('contextmenu', e => {
+    e.preventDefault();
+  })
+  window.addEventListener('click', playAudioIfPaused);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('click', playAudioIfPaused);
 });
 
-const css = computed(() => ({
-  gridWidth: `${gameState.worldData.width * gameState.worldData.tileSize}px`,
-  gridHeight: `${gameState.worldData.height * gameState.worldData.tileSize}px`,
-}));
+function playAudioIfPaused() {
+  const element = audio.value;
+  if (element && element.paused) {
+    element.play();
+  }
+}
 
 </script>
 
 <template>
-  <background-stars/>
-<!--  <game-cursor/>-->
-  <div class="playArea">
-    <pixel-drawer/>
-    <planet-renderer/>
-<!--    <div class="grid">-->
-<!--      <pixel-tile v-for="(pixel, index) in gameState.pixels" :key="index" :pixel="pixel" :offsetX="offsetX"/>-->
-<!--    </div>-->
-    <game-info/>
-  </div>
+  <audio ref="audio" src="background.mp3" volume="0.2" loop preload/>
+  <main-menu v-if="view.current.value === 'menu'"/>
+  <play-game v-if="view.current.value === 'game'"/>
 </template>
-
-<style lang="scss" scoped>
-.playArea {
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  margin-bottom: 200px;
-}
-
-.grid {
-  position: relative;
-  width: v-bind('css.gridWidth');
-  height: v-bind('css.gridHeight');
-  overflow: hidden;
-  border-radius: 50%;
-}
-</style>
-
 <style lang="scss">
 #app {
+  font-size: 80%;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 
 html, body {
   margin: 0;
+  padding: 0;
   background: #191e24;
 }
 </style>

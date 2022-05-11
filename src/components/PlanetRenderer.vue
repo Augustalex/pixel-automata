@@ -1,10 +1,11 @@
 <script setup>
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import {Simulation, useGameState} from "@/gameState";
+import {useGameState} from "@/gameState";
 import {TileSize, WorldHeight, WorldWidth} from "@/utils/constants";
 import {useGridController} from "@/gridController";
 import {useCities} from "@/utils/Cities";
 import {getTileColor} from "@/utils/tileColor";
+import {toCssHslColor} from "@/utils/toCssColor";
 
 const gameState = useGameState();
 
@@ -30,6 +31,13 @@ const css = computed(() => ({
   height: `${WorldHeight * TileSize}px`
 }));
 
+const humidityValue = computed(() => {
+  return -Math.min(Math.round((gameState.info.humidity * 1.5) * 200), 200);
+});
+const ringColor = computed(() => `inset 0 0 40px 20px ${toCssHslColor([23 + humidityValue.value, 90, 90, .5])}`);
+const atmosphereColor = computed(() => `inset 0 0 100px 300px ${toCssHslColor([23 + humidityValue.value, 20, 60, .1])}`);
+const boxShadow = computed(() => ringColor.value + ', ' + atmosphereColor.value);
+
 let lastX = ref(0);
 let lastY = ref(0);
 let lastTile = ref(null);
@@ -39,6 +47,11 @@ onMounted(() => {
   const canvas = canvasRef.value;
   canvas.width = WorldHeight * TileSize;
   canvas.height = WorldHeight * TileSize;
+
+  let move = 0;
+  let stopMove = 0;
+
+  let keysDown = new Set();
 
   canvas.addEventListener('mousemove', (e) => {
     // if (e.buttons !== 1) return;
@@ -63,11 +76,21 @@ onMounted(() => {
 
     if (e.buttons === 1) {
       gridController.onTileClicked(lastTile.value);
+    } else if (e.buttons === 2) {
+      move = e.movementX > 0 ? 1 : -1;
+      stopMove = Date.now() + 250;
     }
   });
 
+  window.addEventListener('keydown', e => {
+    keysDown.add(e.key);
+  });
+  window.addEventListener('keyup', e => {
+    keysDown.delete(e.key);
+  })
+
   canvas.addEventListener('mousedown', (e) => {
-    if (lastTile.value) {
+    if (e.buttons === 1 && lastTile.value) {
       gridController.onTileClicked(lastTile.value);
     }
   });
@@ -88,7 +111,25 @@ onMounted(() => {
       context.fillRect(newX % worldLength - TileSize, y * TileSize, TileSize, TileSize);
     }
 
-    viewOffsetX.value = (viewOffsetX.value + (10 * delta)) % worldLength;
+    if (['ArrowLeft', 'a', 'A'].some(k => keysDown.has(k))) {
+      move = 1;
+      stopMove = now + 250;
+    } else if (['ArrowRight', 'd', 'Da'].some(k => keysDown.has(k))) {
+      move = -1;
+      stopMove = now + 250;
+    }
+
+    if (move !== 0) {
+      if (now - stopMove > 0) {
+        move = 0;
+      } else {
+        const offset = move * 250 * delta;
+        const newOffset = (viewOffsetX.value + offset) % worldLength;
+        viewOffsetX.value = newOffset < 0 ? worldLength + newOffset : newOffset;
+      }
+    } else {
+      viewOffsetX.value = (viewOffsetX.value + (10 * delta)) % worldLength;
+    }
 
     lastNow = now;
 
@@ -140,9 +181,10 @@ onBeforeUnmount(() => {
 <template>
   <div class="canvasWrapper">
     <canvas ref="canvasRef" class="canvas"/>
+    <div class="canvasOverlay"/>
   </div>
 </template>
-<style scoped>
+<style scoped lang="scss">
 .canvasWrapper {
   width: calc(v-bind('css.height'));
   height: calc(v-bind('css.height'));
@@ -159,5 +201,21 @@ onBeforeUnmount(() => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.canvasOverlay {
+  width: calc(v-bind('css.height'));
+  height: calc(v-bind('css.height'));
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  border-radius: 50%;
+  overflow: hidden;
+
+  box-shadow: v-bind(boxShadow);
+
+  pointer-events: none;
 }
 </style>

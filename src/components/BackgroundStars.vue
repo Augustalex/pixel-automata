@@ -58,10 +58,10 @@ function generateStars() {
   const stars = [];
   for (let i = 0; i < 100; i++) {
     stars.push({
-      left: `${Math.round(Math.random() * 4000)}px`,
-      top: `${Math.round(Math.random() * 2000)}px`,
-      height: `${Math.round(Math.random() * 2) + 9}px`,
-      width: `${Math.round(Math.random() * 2) + 9}px`,
+      left: `${Math.round(Math.random() * 1000)/ 10}%`,
+      top: `${Math.round(Math.random() * 1000) /10}%`,
+      height: `${Math.round(Math.random() * .1) + .2}em`,
+      width: `${Math.round(Math.random() * .1) + .2}em`,
       transform: `rotate(${Math.round(Math.random() * 360)}deg)`,
       background: `hsl(${Math.round(Math.random() * 120) + 60}deg, ${Math.round(Math.random() * 50) + 10}%,  ${Math.round(Math.random() * 50) + 50}%)`
     })
@@ -81,8 +81,10 @@ function generateStars() {
 </template>
 <style lang="scss" scoped>
 .window {
-  width: 100vw;
-  height: 100vh;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   position: fixed;
   z-index: 0;
   left: 0;
@@ -101,7 +103,5 @@ function generateStars() {
 
 .star {
   position: absolute;
-  width: 10px;
-  height: 10px;
 }
 </style>

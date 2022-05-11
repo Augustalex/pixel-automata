@@ -18,17 +18,17 @@ function onClick() {
 </script>
 <template>
   <div class="icon" @click="onClick">
-    {{ props.tile.title }}
+    {{ props.tile.displayTitle }}
   </div>
 </template>
 <style lang="scss" scoped>
 .icon {
-  width: 128px;
-  height: 128px;
+  width: 6em;
+  height: 6em;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 18px;
+  padding: .4em;
   font-family: "Comic Sans MS";
   color: white;
   background: v-bind('css.background')
