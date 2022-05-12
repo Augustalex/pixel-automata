@@ -2,8 +2,11 @@ import {PixelDataView} from "@/utils/PixelDataView";
 import {transform} from "@/utils/transformers";
 
 export function SimulateFarms() {
+    const running = false;
+
     return {
-        run
+        run,
+        running: () => running
     };
 
     function run({delta, pixels}) {

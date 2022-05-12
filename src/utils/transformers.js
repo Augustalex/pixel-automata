@@ -2,6 +2,10 @@ export {
     fromGrassToCity, fromGrassToDeadGrass, fromCityToGrass, fromGrassToHumidifier, transform
 }
 
+function noop() {
+
+}
+
 function transform(pixel, toType) {
     getTransformer(pixel, toType)(pixel);
 }
@@ -62,7 +66,8 @@ function getTransformer(pixel, toType) {
         return () => standardTransform(pixel, toType);
     }
 
-    throw new Error('No implementation of transformer from ' + pixel.pixelType + ' to ' + toType);
+    return noop;
+    // throw new Error('No implementation of transformer from ' + pixel.pixelType + ' to ' + toType);
 }
 
 function fromCityToGrass(pixel) {

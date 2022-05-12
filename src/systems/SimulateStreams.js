@@ -8,18 +8,14 @@ export function SimulateStreams() {
     const time = useGameClock();
 
     let flow = {x: 0, y: 0};
-
-    let pacing = 0;
-
+    let running = false;
+    
     return {
-        run
+        run,
+        running: () => running
     };
 
     function run({delta, pixels}) {
-        pacing += delta;
-        if (pacing < .5) return;
-        pacing = 0;
-
         const view = PixelDataView(pixels);
 
         const steps = 20;

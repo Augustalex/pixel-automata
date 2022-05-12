@@ -106,7 +106,6 @@ onMounted(() => {
     context.clearRect(0, 0, canvas.width, canvas.height);
     for (const pixel of gameState.pixels) {
       const {x, y} = pixel.position;
-      console.log(gameState)
       context.fillStyle = colorToCss(color(pixel, gameState.info));
       const newX = Math.round(x * TileSize + viewOffsetX.value);
       context.fillRect(newX % worldLength - TileSize, y * TileSize, TileSize, TileSize);

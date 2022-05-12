@@ -3,8 +3,10 @@ import {PixelDataView} from "@/utils/PixelDataView";
 import {fromCityToGrass, fromGrassToCity, transform} from "@/utils/transformers";
 
 export function ZoneSystem() {
+    let running = false;
     return {
-        run
+        run,
+        running: () => running
     };
 
     function run({delta, pixels}) {

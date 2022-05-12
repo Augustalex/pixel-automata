@@ -35,6 +35,7 @@ window.fpsCounter = () => {
 
 export function Simulation({modules} = {modules: DefaultModules()}) {
     let timeoutId;
+    let systemIndex = 0;
 
     return {
         start,
@@ -51,11 +52,16 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
             const delta = (currentTime - previousTime) / 1000;
             _gameClock.value = (_gameClock.value + delta);
 
-            const moduleProps = {delta, pixels: _state.pixels};
+            const moduleProps = {now: currentTime, delta, pixels: _state.pixels};
 
-            for (let module of modules) {
-                module.run(moduleProps);
+            const runningModule = modules.find(m => m.running());
+            if (!runningModule) {
+                systemIndex += 1;
+                if (systemIndex >= modules.length) {
+                    systemIndex = 0;
+                }
             }
+            modules[systemIndex].run(moduleProps);
 
             frameTimeBuffer.push(performance.now() - start);
 

@@ -5,17 +5,16 @@ import {transform} from "@/utils/transformers";
 export function SimulateHumidifiers() {
     const gameState = useGameState();
 
-    let pacing = 0;
+    let running = false;
+    let lastRunTime = Date.now();
 
     return {
-        run
+        run,
+        running: () => running
     };
 
-    function run({delta, pixels}) {
-        pacing += delta;
-        if (pacing < .25) return;
-        pacing = 0;
-
+    function run({now, pixels}) {
+        const delta = (now - lastRunTime) / 1000;
         const view = PixelDataView(pixels);
 
         let humidity = 0;
@@ -24,7 +23,7 @@ export function SimulateHumidifiers() {
                 if (pixel.radius > 7) {
                     transform(pixel, 'grass')
                 } else {
-                    pixel.readyMeter += 1;
+                    pixel.readyMeter += delta;
                     if (pixel.readyMeter >= 2) {
                         pixel.radius += 2;
                         pixel.readyMeter = 0;
