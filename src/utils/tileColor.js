@@ -1,21 +1,37 @@
 import {iconColor} from "@/utils/iconColor";
 
-export function getTileColor(pixel) {
+export function getTileColor(pixel, worldInfo) {
     const variation = pixel.variation;
     const [baseHue, baseSaturation, baseLightness] = iconColor({title: pixel.pixelType});
     if (pixel.pixelType === 'grass') {
-        const height = pixel.height * 4 + 20;
+        if (pixel.height >= 9) {
+            return [
+                120,
+                60 - 20 * (pixel.height - 9),
+                90 - 20 * (10 - pixel.height)
+            ]
+        }
+
+        const saturationByHeight = pixel.height * 4 + 20;
         return [
-            applyVariation(120, 0, variation),
-            height + .25 * variation,
-            height + .25 * variation,
+            120,
+            saturationByHeight + .25 * variation,
+            saturationByHeight + .25 * variation,
             1
         ];
     }
     if (pixel.pixelType === 'sand') {
+        if (worldInfo.humidity > .1 && pixel.height >= 9) {
+            return [
+                25 + .25 * variation,
+                55 - 10 * (pixel.height - 9),
+                90 - 20 * (10 - pixel.height)
+            ]
+        }
+
         const height = pixel.height * 5 + 20;
         return [
-           25 + .25 * variation,
+            25 + .25 * variation,
             height + .25 * variation,
             height + .25 * variation,
             // height,

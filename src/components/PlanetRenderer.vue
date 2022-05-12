@@ -106,7 +106,8 @@ onMounted(() => {
     context.clearRect(0, 0, canvas.width, canvas.height);
     for (const pixel of gameState.pixels) {
       const {x, y} = pixel.position;
-      context.fillStyle = colorToCss(color(pixel));
+      console.log(gameState)
+      context.fillStyle = colorToCss(color(pixel, gameState.info));
       const newX = Math.round(x * TileSize + viewOffsetX.value);
       context.fillRect(newX % worldLength - TileSize, y * TileSize, TileSize, TileSize);
     }
@@ -138,8 +139,8 @@ onMounted(() => {
 
   loop();
 
-  function color(pixel) {
-    return darken(diffuse(getTileColor(pixel), 1), ((pixel.height) / 40) + .75);
+  function color(pixel, worldInfo) {
+    return darken(diffuse(getTileColor(pixel, worldInfo), 1), ((pixel.height) / 40) + .75);
   }
 
   const title = (pixel) => {

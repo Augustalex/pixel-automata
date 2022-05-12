@@ -16,7 +16,7 @@ const props = defineProps({
   offsetX: Number
 })
 
-const color = computed(() => darken(diffuse(getTileColor(props.pixel), 1), ((props.pixel.height) / 40) + .75));
+const color = computed(() => darken(diffuse(getTileColor(props.pixel, {humidity: 0}), 1), ((props.pixel.height) / 40) + .75));
 
 const title = computed(() => {
   const header = `${capitalize(props.pixel.pixelType)}`;
