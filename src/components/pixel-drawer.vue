@@ -46,16 +46,19 @@ const tiles = computed(() => {
 <template>
   <div class="drawer-container">
     <div class="drawer">
+      TOOLS
       <pixel-icon v-for="tile in tiles" :key="tile.title" :tile="tile" class="drawer-icon"/>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .drawer-container {
   z-index: 2;
   position: relative;
   overflow: hidden;
+
+  font-size: 1.5em;
 }
 
 .drawer {
@@ -71,6 +74,7 @@ const tiles = computed(() => {
 }
 
 .drawer-icon {
+  border: 3px solid white;
   opacity: .6;
 
   &:hover {

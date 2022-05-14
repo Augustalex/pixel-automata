@@ -15,13 +15,6 @@ function onClick() {
   cursor.setHoldingItem(props.tile.title);
 }
 
-const className = computed(() => {
-  const base = ['icon'];
-
-
-  return base.concat([]);
-});
-
 </script>
 <template>
   <div class="icon" @click="onClick">
@@ -30,8 +23,8 @@ const className = computed(() => {
 </template>
 <style lang="scss" scoped>
 .icon {
-  width: 6em;
-  height: 6em;
+  width: 8em;
+  height: 3em;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,9 +34,5 @@ const className = computed(() => {
   background: v-bind('css.background');
   transform: scale(1);
   transition: transform 1s ease-out;
-}
-
-.icon--new {
-  transform: scale(2);
 }
 </style>

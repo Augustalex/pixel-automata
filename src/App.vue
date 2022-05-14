@@ -33,19 +33,24 @@ function playAudioIfPaused() {
   <main-menu v-if="view.current.value === 'menu'"/>
   <play-game v-if="view.current.value === 'game'"/>
 </template>
-<style lang="scss">
+<style>
+
 #app {
   font-size: 80%;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  /*font-family: Avenir, Helvetica, Arial, sans-serif;*/
+  font-family: VCR;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  /*color: white;*/
+  color: hsl(11deg 55% 90%)
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  background: #191e24;
+  /*background: #191e24;*/
+  background: hsl(11deg 55% 14%);
+  /*background: hsl(0, 0, 14%);*/
 }
 </style>
