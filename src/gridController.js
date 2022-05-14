@@ -27,7 +27,7 @@ export function useGridController() {
             if (item === 'raise') {
                 tile.height = Math.min(10, tile.height + 1);
             } else if (item === 'dig') {
-                tile.height = Math.max(0, tile.height - 1);
+                tile.height = Math.max(1, tile.height - 1);
             } else if (tile.surface === 'smooth') {
                 try {
                     transform(tile, item);
