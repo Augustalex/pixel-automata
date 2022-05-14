@@ -74,7 +74,7 @@ onMounted(() => {
     lastX.value = offsetX;
     lastY.value = offsetY;
 
-    if (e.buttons === 1) {
+    if (e.buttons === 1 && lastTile.value) {
       gridController.onTileClicked(lastTile.value);
     } else if (e.buttons === 2) {
       move = e.movementX > 0 ? 1 : -1;

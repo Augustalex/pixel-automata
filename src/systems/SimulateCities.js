@@ -102,7 +102,7 @@ export function SimulateCities() {
                             toMakeGrass.push(t);
                         }
                     }
-                } else if (farmCount > farmRequirement) {
+                } else if (farmCount > farmRequirement + 10) {
                     const grass = view.getNeighbours(pixel, 3, p => p.pixelType === 'grass');
                     if (grass.length > 0) {
                         const anyGrass = grass[Math.round(Math.random() * (grass.length - 1))];

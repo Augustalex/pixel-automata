@@ -15,6 +15,13 @@ function onClick() {
   cursor.setHoldingItem(props.tile.title);
 }
 
+const className = computed(() => {
+  const base = ['icon'];
+
+
+  return base.concat([]);
+});
+
 </script>
 <template>
   <div class="icon" @click="onClick">
@@ -31,6 +38,12 @@ function onClick() {
   padding: .4em;
   font-family: "Comic Sans MS";
   color: white;
-  background: v-bind('css.background')
+  background: v-bind('css.background');
+  transform: scale(1);
+  transition: transform 1s ease-out;
+}
+
+.icon--new {
+  transform: scale(2);
 }
 </style>

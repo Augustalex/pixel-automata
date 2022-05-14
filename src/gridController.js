@@ -1,5 +1,5 @@
 import {useCursor} from "@/useCursor";
-import {fromGrassToCity, fromGrassToHumidifier, transform} from "@/utils/transformers";
+import {transform} from "@/utils/transformers";
 
 export function useGridController() {
     const cursor = useCursor();
@@ -29,35 +29,11 @@ export function useGridController() {
             } else if (item === 'dig') {
                 tile.height = Math.max(0, tile.height - 1);
             } else if (tile.surface === 'smooth') {
-                if (item.startsWith('zone-')) {
-                    tile.pixelType = 'zone';
-                    tile.zoneType = item.split('-')[1];
-                } else {
-                    try {
-                        transform(tile, item);
-                    } catch (err) {
-                        console.error(err);
-                    }
+                try {
+                    transform(tile, item);
+                } catch (err) {
+                    console.error(err);
                 }
-                // if (cursor.holdingItem.value === 'farm') {
-                //     tile.pixelType = 'farm';
-                //     tile.water = 0;
-                //     tile.age = undefined;
-                //     tile.variation = 0;
-                //
-                //     cursor.setHoldingItem('');
-                // } else if (cursor.holdingItem.value === 'grass') {
-                //     tile.variation = 0;
-                //
-                //     cursor.setHoldingItem('');
-                // } else if (cursor.holdingItem.value === 'city') {
-                //     fromGrassToCity(tile);
-                //
-                //     cursor.setHoldingItem('');
-                // } else if (cursor.holdingItem.value === 'humidifier') {
-                //     fromGrassToHumidifier(tile);
-                //
-                // }
             }
         }
     }

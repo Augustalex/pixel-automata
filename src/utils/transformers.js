@@ -31,6 +31,9 @@ function getTransformer(pixel, toType) {
         if (toType === 'road') {
             return fromAnyToRoad;
         }
+        if (toType === 'zone-city') {
+            return zoneTransform(toType);
+        }
     } else if (pixel.pixelType === 'sand') {
         if (toType === 'humidifier') {
             return fromGrassToHumidifier;
@@ -136,4 +139,11 @@ function fromAnyToRoad(pixel) {
     pixel.roadSurface = pixel.pixelType;
 
     standardTransform(pixel, 'road');
+}
+
+function zoneTransform(toType) {
+    return tile => {
+        tile.pixelType = 'zone';
+        tile.zoneType = toType.split('-')[1];
+    }
 }

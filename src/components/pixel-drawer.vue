@@ -1,35 +1,45 @@
 <script setup>
 import PixelIcon from "@/components/pixel-icon";
+import {computed} from "vue";
+import {useGameState} from "@/gameState";
 
-const tiles = [
-  // {
-  //   title: 'grass'
-  // },
-  {
-    title: 'humidifier',
-    displayTitle: 'Humidifier'
-  },
-  {
-    title: 'farm',
-    displayTitle: 'Farm'
-  },
-  {
-    title: 'road',
-    displayTitle: 'Road'
-  },
-  {
-    title: 'zone-city',
-    displayTitle: 'City'
-  },
-  {
-    title: 'dig',
-    displayTitle: 'Dig'
-  },
-  {
-    title: 'raise',
-    displayTitle: 'Raise'
-  }
-];
+const gameState = useGameState();
+
+const tiles = computed(() => {
+  console.log('reevaluate');
+  const canBuildFarm = gameState.info.humidity > .15;
+  const canBuildCity = gameState.pixels.some(p => p.pixelType === 'farm');
+  const builtFirstCity = gameState.pixels.some(p => p.pixelType === 'city' || p.pixelType === 'zone-city');
+  return [
+    // {
+    //   title: 'grass'
+    // },
+    {
+      title: 'humidifier',
+      displayTitle: 'Humidifier'
+    },
+    canBuildFarm && {
+      title: 'farm',
+      displayTitle: 'Farm'
+    },
+    canBuildCity && {
+      title: 'road',
+      displayTitle: 'Road'
+    },
+    canBuildCity && {
+      title: 'zone-city',
+      displayTitle: 'City'
+    },
+    builtFirstCity && {
+      title: 'dig',
+      displayTitle: 'Dig'
+    },
+    builtFirstCity && {
+      title: 'raise',
+      displayTitle: 'Raise'
+    }
+  ].filter(i => !!i);
+});
 
 </script>
 
@@ -49,7 +59,7 @@ const tiles = [
 }
 
 .drawer {
-  opacity: .05;
+  opacity: .4;
   padding: 90px;
   margin: -90px;
 
