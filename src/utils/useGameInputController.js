@@ -66,13 +66,9 @@ export function useGameInputController({target}) {
     }
 
     function onMouseMove(e) {
-        // if (e.buttons !== 1) return;
-        // vx = round(x * size + offset) % worldHeight - TileSize
-        // x = vx + TileSize + round(
-
         const preX = e.offsetX - viewOffset.get().value;
         const postX = preX < 0 ? viewOffset.worldLength() + preX : preX;
-        const newX = Math.ceil((postX) / TileSize);
+        const newX = Math.round((postX) / TileSize);
         const offsetX = newX;
         const offsetY = Math.floor(e.offsetY / TileSize);
 

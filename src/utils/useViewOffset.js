@@ -37,15 +37,9 @@ export function useViewOffset() {
                 const offset = move * 250 * delta;
                 const newOffset = (viewOffset.value + offset) % worldLength();
                 viewOffset.value = (newOffset < 0 ? worldLength() + newOffset : newOffset);
-                if (viewOffset.value.toString() === 'NaN') {
-                    console.log('naaaan!')
-                    console.log(newOffset, worldLength(), move);
-                }
             }
         } else {
             viewOffset.value = (viewOffset.value + (10 * delta)) % worldLength();
-            if (viewOffset.value.toString() === 'NaN') console.log('naaaan!')
-
         }
     }
 }
