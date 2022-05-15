@@ -6,7 +6,6 @@ import {useGameState} from "@/gameState";
 const gameState = useGameState();
 
 const tiles = computed(() => {
-  console.log('reevaluate');
   const canBuildFarm = gameState.info.humidity > .15;
   const canBuildCity = gameState.pixels.some(p => p.pixelType === 'farm');
   const builtFirstCity = gameState.pixels.some(p => p.pixelType === 'city' || p.pixelType === 'zone-city');
@@ -46,7 +45,7 @@ const tiles = computed(() => {
 <template>
   <div class="drawer-container">
     <div class="drawer">
-      TOOLS
+      <span class="drawer-title">TOOLS</span>
       <pixel-icon v-for="tile in tiles" :key="tile.title" :tile="tile" class="drawer-icon"/>
     </div>
   </div>
@@ -59,6 +58,11 @@ const tiles = computed(() => {
   overflow: hidden;
 
   font-size: 1.5em;
+}
+
+.drawer-title {
+  margin-bottom: .5em;
+  display: inline-block;
 }
 
 .drawer {

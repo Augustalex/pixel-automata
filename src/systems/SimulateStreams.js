@@ -2,6 +2,8 @@ import {PixelDataView} from "@/utils/PixelDataView";
 import {useGameClock} from "@/gameState";
 
 export function SimulateStreams() {
+    const view = PixelDataView();
+
     const wavelength = .6;
     let offset = {x: -10000, y: 10000};
     const speedScale = 2;
@@ -16,7 +18,6 @@ export function SimulateStreams() {
     };
 
     function run({delta, pixels}) {
-        const view = PixelDataView(pixels);
 
         const steps = 20;
 

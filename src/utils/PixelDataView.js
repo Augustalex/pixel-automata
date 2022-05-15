@@ -1,25 +1,22 @@
-import {TileSize, WorldWidth} from "@/utils/constants";
+import {WorldWidth} from "@/utils/constants";
+import {useGameState} from "@/gameState";
 
-export function PixelDataView(pixels) {
-    const pixelMap = new Map();
-    const countByType = new Map();
+let loaded = false;
+const pixelMap = new Map();
 
-    for (let pixel of pixels) {
-        pixelMap.set(key(pixel), pixel);
+export function PixelDataView() {
+    const gameState = useGameState();
 
-        const pixelType = pixel.pixelType;
-        countByType[pixelType] = countByType[pixelType] || 0;
-        countByType[pixelType] += 1;
+    if (!loaded) {
+        for (let pixel of gameState.pixels) {
+            pixelMap.set(key(pixel), pixel);
+        }
+        loaded = true;
     }
 
     return {
         getNeighbours,
         getNeighboursCircular,
-        count
-    }
-
-    function count(pixelType) {
-        return countByType[pixelType] || 0;
     }
 
     function getNeighbours(pixel, radius, checkFn) {

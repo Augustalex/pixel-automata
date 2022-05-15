@@ -1,21 +1,22 @@
 import {PixelDataView} from "@/utils/PixelDataView";
-import {useGameClock, useGameState} from "@/gameState";
+import {useGameState} from "@/gameState";
 import {transform} from "@/utils/transformers";
 
 export function SimulateHumidifiers() {
     const gameState = useGameState();
+    const view = PixelDataView();
 
     let running = false;
     let lastRunTime = Date.now();
 
     return {
         run,
-        running: () => running
+        running: () => running,
+        alwaysRun: true
     };
 
     function run({now, pixels}) {
         const delta = (now - lastRunTime) / 1000;
-        const view = PixelDataView(pixels);
 
         let humidity = 0;
         for (let pixel of pixels) {
@@ -35,27 +36,10 @@ export function SimulateHumidifiers() {
                 }
             } else if (pixel.pixelType === 'grass') {
                 humidity += 1;
-            } else if (pixel.pixelType === 'sand') {
-                // humidity -= 1;
             }
         }
 
         const finalHumidity = Math.max(0, humidity);
         gameState.info.humidity = (finalHumidity / pixels.length);
-
-        const toMakeWater = [];
-        const waterLevel = Math.round(gameState.info.humidity * 10) - 1;
-        for (let pixel of pixels) {
-            if (pixel.height <= waterLevel && pixel.pixelType !== 'water' && pixel.pixelType !== 'space') {
-                const nearbyWater = view.getNeighbours(pixel, 3, p => p.pixelType === 'water');
-                if (pixel.height === 0 || nearbyWater.length > 0) {
-                    toMakeWater.push(pixel);
-                }
-            }
-        }
-
-        for (let toMakeWaterElement of toMakeWater) {
-            transform(toMakeWaterElement, 'water');
-        }
     }
 }

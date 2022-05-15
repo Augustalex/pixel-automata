@@ -4,6 +4,7 @@ import {fromCityToGrass, fromGrassToCity, transform} from "@/utils/transformers"
 import {Tags} from "@/utils/constants";
 
 export function SimulateCities() {
+    const view = PixelDataView();
     const time = useGameClock();
 
     let nextRun = 0;
@@ -33,8 +34,6 @@ export function SimulateCities() {
                 running = false;
             }
         }
-
-        const view = PixelDataView(pixels);
 
         // const toMakeCities = [];
 
@@ -102,7 +101,7 @@ export function SimulateCities() {
                             toMakeGrass.push(t);
                         }
                     }
-                } else if (farmCount > farmRequirement + 10) {
+                } else if (farmCount > farmRequirement + 1) {
                     const grass = view.getNeighbours(pixel, 3, p => p.pixelType === 'grass');
                     if (grass.length > 0) {
                         const anyGrass = grass[Math.round(Math.random() * (grass.length - 1))];
@@ -111,16 +110,20 @@ export function SimulateCities() {
                     }
                 }
             }
-            for (let toGrass of toMakeGrass) {
-                if (Math.random() > .5) continue;
-                if (toGrass.pixelType !== 'city') continue;
-                transform(toGrass, 'zone');
 
-                const cities = view.getNeighbours(toGrass, 3, p => 'city' === p.pixelType);
-                for (let city of cities) {
-                    city.cityLevel = Math.max(0, city.cityLevel - 1);
-                }
+            if (toMakeGrass.length > 3) {
+                console.log("people are starving!")
             }
+            // for (let toGrass of toMakeGrass) {
+            //     if (Math.random() > .5) continue;
+            //     if (toGrass.pixelType !== 'city') continue;
+            //     transform(toGrass, 'zone');
+            //
+            //     const cities = view.getNeighbours(toGrass, 3, p => 'city' === p.pixelType);
+            //     for (let city of cities) {
+            //         city.cityLevel = Math.max(0, city.cityLevel - 1);
+            //     }
+            // }
         }
 
         function assignIdsToRoadNetwork(road, roadId) {

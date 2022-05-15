@@ -18,9 +18,9 @@ export function iconColor(tileInfo) {
         1
     ];
     if (tileInfo.title === 'humidifier') return [
-        350,
-        60,
-        80,
+        120,
+        30,
+        55,
         1
     ];
     if (tileInfo.title === 'dig') return [

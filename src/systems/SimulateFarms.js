@@ -2,6 +2,8 @@ import {PixelDataView} from "@/utils/PixelDataView";
 import {transform} from "@/utils/transformers";
 
 export function SimulateFarms() {
+    const view = PixelDataView();
+
     const running = false;
 
     return {
@@ -10,7 +12,6 @@ export function SimulateFarms() {
     };
 
     function run({delta, pixels}) {
-        const view = PixelDataView(pixels);
 
         for (let pixel of pixels) {
             if (pixel.pixelType === 'farm') {

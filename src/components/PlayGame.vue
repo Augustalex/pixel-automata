@@ -1,19 +1,31 @@
 <script setup>
 import {Simulation, useGameState} from "@/gameState";
-import PixelTile from "@/components/pixel-tile";
 import {computed, onMounted, ref} from "vue";
 import PixelDrawer from "@/components/pixel-drawer";
 import {useMousePosition} from "@/useMousePosition";
-import GameCursor from "@/components/game-cursor";
 import GameInfo from "@/components/GameInfo";
-import Stars from "@/components/BackgroundStars";
-import BackgroundStars from "@/components/BackgroundStars";
 import PlanetRenderer from "@/components/PlanetRenderer";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
 
 const offsetX = ref(20);
+
+const yMax = window.innerHeight * 1.5;
+const startingY = ref(yMax);
+
+const transitionLength = 4;
+const transitionTime = ref(0);
+const started = ref(false);
+
+const yPosition = computed(() => `translateY(${startingY.value}px)`);
+const opacity = computed(() => `1`);
+const sideBarsOpacity = computed(() => Math.max(0, Math.min(1, 1 - (startingY.value / 100))));
+
+function getOpacity(transitionTime) {
+  const eased = 1 - easeOutCubic((transitionTime) / 2);
+  return 1 - Math.min(1, Math.max(0, (eased + .5)))
+}
 
 onMounted(() => {
   const simulation = Simulation();
@@ -41,6 +53,18 @@ onMounted(() => {
 
     offsetX.value += delta * 10;
 
+    if (!started.value) {
+      transitionTime.value = Date.now();
+      started.value = true;
+    }
+
+    const progressAbsolute = now - transitionTime.value;
+    const progress = (progressAbsolute / 1000) / transitionLength;
+    if (progress <= 1) {
+      const number = 1 - easeOutCubic(progress);
+      startingY.value = yMax * (number);
+    }
+
     lastNow = now;
 
     requestAnimationFrame(planetRotationLoop);
@@ -48,6 +72,26 @@ onMounted(() => {
 
   planetRotationLoop();
 });
+
+function easeOutCubic(x) {
+  return 1 - Math.pow(1 - x, 3);
+}
+
+function easeOutSine(x) {
+  return Math.sin((x * Math.PI) / 2);
+}
+
+function easeOutQuint(x) {
+  return 1 - Math.pow(1 - x, 5);
+}
+
+function easeOutCirc(x) {
+  return Math.sqrt(1 - Math.pow(x - 1, 2));
+}
+
+function easeInOutCubic(x) {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
 
 const css = computed(() => ({
   gridWidth: `${gameState.worldData.width * gameState.worldData.tileSize}px`,
@@ -57,7 +101,6 @@ const css = computed(() => ({
 </script>
 
 <template>
-  <background-stars/>
   <!--  <game-cursor/>-->
   <div class="playArea">
     <pixel-drawer class="playArea-left"/>
@@ -72,6 +115,7 @@ const css = computed(() => ({
 <style lang="scss" scoped>
 .playArea {
   position: absolute;
+  transform: v-bind('yPosition');
   top: 0;
   left: 0;
   bottom: 0;
@@ -80,6 +124,7 @@ const css = computed(() => ({
   align-items: center;
   justify-content: center;
   display: flex;
+  opacity: v-bind('opacity');
 }
 
 .playArea-left {
@@ -91,6 +136,8 @@ const css = computed(() => ({
   align-items: flex-end;
 
   padding-right: 6em;
+
+  opacity: v-bind('sideBarsOpacity');
 }
 
 .playArea-middle {
@@ -105,6 +152,7 @@ const css = computed(() => ({
   align-items: flex-start;
 
   margin-left: 6em;
+  opacity: v-bind('sideBarsOpacity');
 }
 
 .grid {

@@ -29,10 +29,10 @@ function onClick() {
   justify-content: center;
   align-items: center;
   padding: .4em;
-  font-family: "Comic Sans MS";
   color: white;
   background: v-bind('css.background');
   transform: scale(1);
   transition: transform 1s ease-out;
+  margin: 12px 0;
 }
 </style>

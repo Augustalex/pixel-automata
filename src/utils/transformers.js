@@ -47,6 +47,13 @@ function getTransformer(pixel, toType) {
         if (toType === 'road') {
             return fromAnyToRoad;
         }
+    } else if (pixel.pixelType === 'water') {
+        if (toType === 'grass') {
+            return () => standardTransform(pixel, 'grass');
+        }
+        // if (toType === 'sand') {
+        //     return () => standardTransform(pixel, 'sand');
+        // }
     } else if (pixel.pixelType === 'humidifier') {
         if (toType === 'water') {
             return () => standardTransform(pixel, 'water');

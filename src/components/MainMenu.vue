@@ -1,162 +1,142 @@
 <script setup>
+import PlanetImage from "@/components/PlanetImage";
 import {useView} from "@/utils/useView";
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 
 const view = useView();
+const startingLength = 2;
+const startingTime = ref(0);
+const startingProgress = ref(0);
+const starting = ref(false);
+const visible = ref(true);
 
-const offsetX = ref(300);
-const offsetY = ref(100);
-const running = ref(false);
+const css = computed(() => ({
+  background: `hsl(0, 0%, 14%)`
+}));
 
-const planetCss = computed(() => ({
-  transform: `translate(${offsetX.value}px, ${offsetY.value}px)`
+const fadeOut = computed(() => ({
+  opacity: 1 - startingProgress.value
 }))
 
-onMounted(() => {
-  running.value = true;
-
-  let lastTime = Date.now();
-  const loop = () => {
-    if (!running.value) return;
-    const now = Date.now();
-    const delta = (now - lastTime) / 1000;
-
-    offsetX.value -= delta * 4;
-    offsetY.value -= delta * (4 - (offsetY.value / 100));
-
-    lastTime = now;
-    requestAnimationFrame(loop);
+function start() {
+  if (starting.value) {
+    return;
+  } else {
+    starting.value = true;
+    startingTime.value = Date.now();
   }
+
+  const loop = () => {
+    const now = Date.now();
+
+    const progress = ((now - startingTime.value) / 1000) / startingLength;
+    if (progress < 1) {
+      startingProgress.value = easeOutCubic(progress)
+    }
+
+    if (progress > .2) {
+      view.startGame();
+    }
+
+    if (progress > 1) {
+      visible.value = false;
+    } else {
+      requestAnimationFrame(loop);
+    }
+  };
   loop();
-});
+}
 
-onBeforeUnmount(() => {
-  running.value = false;
-})
-
+function easeOutCubic(x) {
+  return 1 - Math.pow(1 - x, 3);
+}
 </script>
 <template>
-  <div class="background-container">
-    <img alt="earth" class="background-a" src="/background_a_pixel.png"/>
-    <img alt="mars behind sky" class="mars-1" src="/mars_pixel.png"/>
-    <img alt="sky filter on top of mars" class="skymask" src="/skymask_pixel.png"/>
-    <img alt="slight mars color fill in" class="mars-2" src="/mars_pixel.png"/>
-  </div>
+  <template v-if="visible">
+    <div class="backgroundColor"/>
+    <div class="fadeout">
 
-  <div class="menu-leftPosition">
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-    <button class="button">*****</button>
-  </div>
-  <div class="menu-position">
-    <button class="button" @click="view.startGame">
-      START
-    </button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-    <button class="button">/////</button>
-  </div>
+      <planet-image/>
+      <div class="menu-leftPosition">
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">////<span class="red-letter">R</span></span>
+        <span class="button">////<span class="red-letter">E</span></span>
+        <span class="button">////<span class="red-letter">D</span></span>
+        <span class="button">/////</span>
+        <span class="button">////<span class="red-letter">P</span></span>
+        <span class="button">////<span class="red-letter">I</span></span>
+        <span class="button">////<span class="red-letter">X</span></span>
+        <span class="button">////<span class="red-letter">E</span></span>
+        <span class="button">////<span class="red-letter">L</span></span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+      </div>
+      <div class="menu-position">
+        <button class="button red-letter" @click="start">
+          START
+        </button>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+        <span class="button">/////</span>
+      </div>
+    </div>
+  </template>
 </template>
 <style lang="scss" scoped>
+.fadeout {
+  opacity: v-bind('fadeOut.opacity');
+}
 
-.background-container {
-  z-index: 1;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  /*width: 762px;*/
-  /*height: 762px;*/
-  border: 24px solid rgba(245, 163, 147, 0.9);
+.backgroundColor {
+  width: 100vw;
   height: 100vh;
-  width: 100vh;
-  box-sizing: border-box;
-
-  & > img {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  overflow: hidden;
-}
-
-.background-a {
-  width: 100%;
-  height: 100%;
-}
-
-.skymask {
-  width: 100%;
-  height: 100%;
-}
-
-.mars-1 {
-  width: 100%;
-  height: 100%;
-
-  transform: v-bind('planetCss.transform');
-}
-
-.mars-2 {
-  opacity: .12;
-  width: 100%;
-  height: 100%;
-
-  transform: v-bind('planetCss.transform');
+  z-index: 0;
+  //background: hsla(0, 0, 95%);
+  background: v-bind('css.background');
 }
 
 .menu-leftPosition {
@@ -167,9 +147,6 @@ onBeforeUnmount(() => {
   top: 50%;
   left: calc(50% - 50vh);
   transform: translate(-100%, -50%);
-  /*width: 762px;*/
-  /*height: 762px;*/
-  /*border: 24px solid rgba(245, 163, 147, 0.9);*/
   height: 100%;
   box-sizing: border-box;
 }
@@ -182,25 +159,39 @@ onBeforeUnmount(() => {
   top: 50%;
   right: calc(50% - 50vh);
   transform: translate(100%, -50%);
-  /*width: 762px;*/
-  /*height: 762px;*/
   height: 100%;
   box-sizing: border-box;
 }
 
 .button {
+  display: block;
   font-family: VCR;
-  color: rgba(245, 163, 147, 0.9);
-  //color: hsla(0, 0, 147, 0.9);
   background: none;
   border: none;
   font-size: 42px;
+  margin: 1px 5px;
+  //color: rgba(245, 163, 147, 0.9);
+  color: hsla(0, 0, 147, 0.9);
+  padding: 0;
 
   &:hover {
-    color: white;
-    //color: black;
-    //background: hsla(0, 0, 147, 0.9);
-    background: rgba(245, 163, 147, 0.9);
+    //color: white;
+    color: black;
+
+    //background: rgba(245, 163, 147, 0.9);
+    background: hsla(0, 0, 147, 0.9);
+  }
+}
+
+button.button:hover {
+  cursor: pointer;
+}
+
+.red-letter {
+  color: hsl(0deg 55% 55%);
+
+  &:hover {
+    color: hsl(0deg 55% 55%);
   }
 }
 </style>

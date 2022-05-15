@@ -1,9 +1,4 @@
 import {reactive, ref} from "vue";
-import {SimulateCities} from "@/systems/SimulateCities";
-import {SimulateStreams} from "@/systems/SimulateStreams";
-import {SimulateHumidifiers} from "@/systems/SimulateHumidifiers";
-import {SimulateFarms} from "@/systems/SimulateFarms";
-import {ZoneSystem} from "@/systems/ZoneSystem";
 import {TileSize, WorldHeight, WorldWidth} from "@/utils/constants";
 
 const _gameClock = ref(0);
@@ -44,34 +39,39 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
     };
 
     function start() {
-        let previousTime = Date.now();
-
-        const loop = () => {
-            const start = performance.now();
-            const currentTime = Date.now();
-            const delta = (currentTime - previousTime) / 1000;
-            _gameClock.value = (_gameClock.value + delta);
-
-            const moduleProps = {now: currentTime, delta, pixels: _state.pixels};
-
-            const runningModule = modules.find(m => m.running());
-            if (!runningModule) {
-                systemIndex += 1;
-                if (systemIndex >= modules.length) {
-                    systemIndex = 0;
-                }
-            }
-            modules[systemIndex].run(moduleProps);
-
-            frameTimeBuffer.push(performance.now() - start);
-
-            if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
-
-            previousTime = currentTime;
-            timeoutId = setTimeout(loop, 250);
-        };
-
-        loop();
+        // let previousTime = Date.now();
+        //
+        // const loop = () => {
+        //     const start = performance.now();
+        //     const currentTime = Date.now();
+        //     const delta = (currentTime - previousTime) / 1000;
+        //     _gameClock.value = (_gameClock.value + delta);
+        //
+        //     const moduleProps = {now: currentTime, delta, pixels: _state.pixels};
+        //
+        //     const runningModule = modules.find(m => !m.alwaysRun && m.running());
+        //     if (!runningModule) {
+        //         systemIndex += 1;
+        //         if (systemIndex >= modules.length) {
+        //             systemIndex = 0;
+        //         }
+        //     }
+        //     modules[systemIndex].run(moduleProps);
+        //
+        //     for (let alwaysRunModule of modules.filter(m => m.alwaysRun)) {
+        //         alwaysRunModule.run(moduleProps)
+        //     }
+        //
+        //
+        //     frameTimeBuffer.push(performance.now() - start);
+        //
+        //     if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
+        //
+        //     previousTime = currentTime;
+        //     timeoutId = setTimeout(loop, 250);
+        // };
+        //
+        // loop();
     }
 
     function stop() {
@@ -88,11 +88,12 @@ function DefaultModules() {
     return [
         // SimulateGrassGrowth(),
         // SimulateGlobalWarming(),
-        SimulateCities(),
-        SimulateStreams(),
-        SimulateHumidifiers(),
-        SimulateFarms(),
-        ZoneSystem()
+        // SimulateCities(),
+        // SimulateStreams(),
+        // SimulateHumidifiers(),
+        // SimulateWaterSpread(),
+        // SimulateFarms(),
+        // ZoneSystem()
     ];
 }
 
