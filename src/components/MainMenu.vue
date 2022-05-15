@@ -2,6 +2,7 @@
 import PlanetImage from "@/components/PlanetImage";
 import {useView} from "@/utils/useView";
 import {computed, ref} from "vue";
+import FlowRow from "@/components/FlowRow";
 
 const view = useView();
 const startingLength = 2;
@@ -56,72 +57,72 @@ function easeOutCubic(x) {
     <div class="backgroundColor"/>
     <div class="fadeout">
 
-      <planet-image/>
+      <planet-image @click="start"/>
       <div class="menu-leftPosition">
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">////<span class="red-letter">R</span></span>
-        <span class="button">////<span class="red-letter">E</span></span>
-        <span class="button">////<span class="red-letter">D</span></span>
-        <span class="button">/////</span>
-        <span class="button">////<span class="red-letter">P</span></span>
-        <span class="button">////<span class="red-letter">I</span></span>
-        <span class="button">////<span class="red-letter">X</span></span>
-        <span class="button">////<span class="red-letter">E</span></span>
-        <span class="button">////<span class="red-letter">L</span></span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
+        <flow-row/>
+        <flow-row/>
+        <flow-row letters="R"/>
+        <flow-row letters="E"/>
+        <flow-row letters="D"/>
+        <flow-row/>
+        <flow-row letters="P"/>
+        <flow-row letters="I"/>
+        <flow-row letters="X"/>
+        <flow-row letters="E"/>
+        <flow-row letters="L"/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
       </div>
       <div class="menu-position">
         <button class="button red-letter" @click="start">
           START
         </button>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
-        <span class="button">/////</span>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
+        <flow-row/>
       </div>
     </div>
   </template>
@@ -163,7 +164,9 @@ function easeOutCubic(x) {
   box-sizing: border-box;
 }
 
-.button {
+button.button {
+  cursor: default;
+  user-select: none;
   display: block;
   font-family: VCR;
   background: none;
@@ -187,7 +190,7 @@ button.button:hover {
   cursor: pointer;
 }
 
-.red-letter {
+button.red-letter {
   color: hsl(0deg 55% 55%);
 
   &:hover {

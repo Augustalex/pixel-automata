@@ -41,11 +41,6 @@ onMounted(() => {
     }
   });
 
-  window.addEventListener('mousemove', e => {
-    mousePosition.x = e.clientX;
-    mousePosition.y = e.clientY;
-  });
-
   let lastNow = Date.now();
   const planetRotationLoop = () => {
     const now = Date.now();

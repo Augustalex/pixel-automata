@@ -5,6 +5,9 @@ import {useGameState} from "@/gameState";
 import {useGridController} from "@/gridController";
 import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
 
+let mouseMoving = ref(null);
+const scrollTime = 3000;
+
 export function useGameInputController({target}) {
     const gameState = useGameState();
     const gridController = useGridController();
@@ -23,6 +26,13 @@ export function useGameInputController({target}) {
     };
 
     function update({delta, now}) {
+        if (mouseMoving.value) {
+            if (mouseMoving.value.time > now) {
+                const progress = (mouseMoving.value.time - now) / scrollTime;
+                rotateAction.rotate((mouseMoving.value.x > 0 ? 1 : -1) * mouseMoving.value.speed * Math.min(1, Math.max(0, progress)), Date.now() + 2000);
+            }
+        }
+
         if (anyKeyDown(['ArrowLeft', 'a', 'A'])) {
             rotateAction.rotate(1, now + 250);
         } else if (anyKeyDown(['ArrowRight', 'd', 'D'])) {
@@ -85,7 +95,9 @@ export function useGameInputController({target}) {
         if (e.buttons === 1) {
             gridController.onTileClicked(lastTile.value);
         } else if (e.buttons === 2) {
-            rotateAction.rotate(e.movementX > 0 ? 1 : -1, Date.now() + 250)
+            const speed = Math.max(0, Math.min(1, Math.abs(e.movementX) / 100)) * 2;
+            mouseMoving.value = {speed, x: e.movementX, time: Date.now() + scrollTime};
+            rotateAction.rotate((e.movementX > 0 ? 1 : -1) * speed, Date.now() + 250)
         }
     }
 

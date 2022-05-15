@@ -1,16 +1,22 @@
 <script setup>
 import {useView} from "@/utils/useView";
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {useMousePosition} from "@/useMousePosition";
 
 const view = useView();
+const mousePosition = useMousePosition();
 
-const offsetX = ref(300);
-const offsetY = ref(100);
+const offsetX = ref(250);
+const offsetY = ref(50);
 const running = ref(false);
 
 const planetCss = computed(() => ({
-  transform: `translate(-50% + ${offsetX.value}px, -50% + ${offsetY.value}px)`
+  transform: `translate(${offsetX.value}px, ${offsetY.value}px)`
 }))
+
+const backgroundCss = computed(() => ({
+  transform: `translate(${(mousePosition.x - window.innerWidth / 2) * .004}px, ${(mousePosition.y - window.innerHeight / 2) * .001}px) scale(1.01)`
+}));
 
 onMounted(() => {
   running.value = true;
@@ -40,7 +46,7 @@ onBeforeUnmount(() => {
     <img alt="earth" class="background-a" src="/background_a_pixel.png"/>
     <div alt="mars behind sky" class="mars-1" src="/mars_pixel.png"/>
     <img alt="sky filter on top of mars" class="skymask" src="/skymask_pixel.png"/>
-    <div alt="slight mars color fill in" class="mars-2" src="/mars_pixel.png"/>
+    <div alt="slight mars color fill in" class="mars-2" src="/mars_pixel.png" @click="$emit('click')"/>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -68,6 +74,8 @@ onBeforeUnmount(() => {
 .background-a {
   width: 100%;
   height: 100%;
+
+  transform: v-bind('backgroundCss.transform')
 }
 
 .skymask {

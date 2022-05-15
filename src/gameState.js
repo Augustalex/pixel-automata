@@ -1,5 +1,11 @@
 import {reactive, ref} from "vue";
 import {TileSize, WorldHeight, WorldWidth} from "@/utils/constants";
+import {SimulateCities} from "@/systems/SimulateCities";
+import {SimulateStreams} from "@/systems/SimulateStreams";
+import {SimulateHumidifiers} from "@/systems/SimulateHumidifiers";
+import {SimulateWaterSpread} from "@/systems/SimulateWaterSpread";
+import {SimulateFarms} from "@/systems/SimulateFarms";
+import {ZoneSystem} from "@/systems/ZoneSystem";
 
 const _gameClock = ref(0);
 const _state = reactive({
@@ -14,6 +20,18 @@ const _state = reactive({
     pixels: GenerateWorld(WorldWidth, WorldHeight)
 });
 
+export const useGlobalGameClock = () => {
+    if (_gameClock.value === 0) {
+        const loop = () => {
+            _gameClock.value = Date.now();
+
+            requestAnimationFrame(loop);
+        };
+        loop();
+    }
+
+    return _gameClock;
+};
 export const useGameClock = () => _gameClock;
 export const useGameState = () => _state;
 
@@ -39,39 +57,39 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
     };
 
     function start() {
-        // let previousTime = Date.now();
-        //
-        // const loop = () => {
-        //     const start = performance.now();
-        //     const currentTime = Date.now();
-        //     const delta = (currentTime - previousTime) / 1000;
-        //     _gameClock.value = (_gameClock.value + delta);
-        //
-        //     const moduleProps = {now: currentTime, delta, pixels: _state.pixels};
-        //
-        //     const runningModule = modules.find(m => !m.alwaysRun && m.running());
-        //     if (!runningModule) {
-        //         systemIndex += 1;
-        //         if (systemIndex >= modules.length) {
-        //             systemIndex = 0;
-        //         }
-        //     }
-        //     modules[systemIndex].run(moduleProps);
-        //
-        //     for (let alwaysRunModule of modules.filter(m => m.alwaysRun)) {
-        //         alwaysRunModule.run(moduleProps)
-        //     }
-        //
-        //
-        //     frameTimeBuffer.push(performance.now() - start);
-        //
-        //     if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
-        //
-        //     previousTime = currentTime;
-        //     timeoutId = setTimeout(loop, 250);
-        // };
-        //
-        // loop();
+        let previousTime = Date.now();
+
+        const loop = () => {
+            const start = performance.now();
+            const currentTime = Date.now();
+            const delta = (currentTime - previousTime) / 1000;
+            _gameClock.value = (_gameClock.value + delta);
+
+            const moduleProps = {now: currentTime, delta, pixels: _state.pixels};
+
+            const runningModule = modules.find(m => !m.alwaysRun && m.running());
+            if (!runningModule) {
+                systemIndex += 1;
+                if (systemIndex >= modules.length) {
+                    systemIndex = 0;
+                }
+            }
+            modules[systemIndex].run(moduleProps);
+
+            for (let alwaysRunModule of modules.filter(m => m.alwaysRun)) {
+                alwaysRunModule.run(moduleProps)
+            }
+
+
+            frameTimeBuffer.push(performance.now() - start);
+
+            if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
+
+            previousTime = currentTime;
+            timeoutId = setTimeout(loop, 250);
+        };
+
+        loop();
     }
 
     function stop() {
@@ -88,12 +106,12 @@ function DefaultModules() {
     return [
         // SimulateGrassGrowth(),
         // SimulateGlobalWarming(),
-        // SimulateCities(),
-        // SimulateStreams(),
-        // SimulateHumidifiers(),
-        // SimulateWaterSpread(),
-        // SimulateFarms(),
-        // ZoneSystem()
+        SimulateCities(),
+        SimulateStreams(),
+        SimulateHumidifiers(),
+        SimulateWaterSpread(),
+        SimulateFarms(),
+        ZoneSystem()
     ];
 }
 
