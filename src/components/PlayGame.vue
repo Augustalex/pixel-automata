@@ -5,6 +5,7 @@ import PixelDrawer from "@/components/pixel-drawer";
 import {useMousePosition} from "@/useMousePosition";
 import GameInfo from "@/components/GameInfo";
 import PlanetRenderer from "@/components/PlanetRenderer";
+import InfoBar from "@/components/InfoBar";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
@@ -105,6 +106,7 @@ const css = computed(() => ({
     <!--    </div>-->
     <game-info class="playArea-right"/>
   </div>
+  <info-bar />
 </template>
 
 <style lang="scss" scoped>

@@ -1,11 +1,14 @@
 import {PixelDataView} from "@/utils/PixelDataView";
 import {useGameState} from "@/gameState";
 import {getTransformer} from "@/utils/transformers";
+import {useNotifications} from "@/utils/useNotifications";
 
 export function SimulateWaterSpread() {
     const gameState = useGameState();
     const view = PixelDataView();
+    const notifications = useNotifications()
 
+    let hasWater = false;
     let running = false;
 
     return {
@@ -30,7 +33,14 @@ export function SimulateWaterSpread() {
         }
 
         for (let toMakeWaterElement of toMakeWater) {
-            getTransformer(toMakeWaterElement, 'water')?.(toMakeWaterElement);
+            const transformer = getTransformer(toMakeWaterElement, 'water');
+            if (transformer) {
+                transformer(toMakeWaterElement);
+                if (!hasWater) {
+                    hasWater = true;
+                    notifications.waterOnMars();
+                }
+            }
         }
     }
 }
