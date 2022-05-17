@@ -39,7 +39,7 @@ function getTransformer(pixel, toType) {
             return fromGrassToHumidifier;
         }
         if (toType === 'grass') {
-            return fromSandToGrass;
+            return toGrass;
         }
         if (toType === 'water') {
             return () => standardTransform(pixel, 'water');
@@ -73,7 +73,12 @@ function getTransformer(pixel, toType) {
             return () => standardTransform(pixel, toType);
         }
     } else if (pixel.pixelType === 'road') {
-        return () => standardTransform(pixel, toType);
+        if (toType === 'grass') {
+            return toGrass;
+        }
+        if (toType === 'water' || toType === 'sand') {
+            return () => standardTransform(pixel, toType);
+        }
     }
 
     return noop;
@@ -123,7 +128,7 @@ function fromGrassToHumidifier(pixel) {
     pixel.readyMeter = 0;
 }
 
-function fromSandToGrass(pixel) {
+function toGrass(pixel) {
     pixel.age = 0;
     standardTransform(pixel, 'grass');
 }

@@ -89,11 +89,15 @@ function easeOutCubic(x) {
         <flow-row/>
         <flow-row/>
         <flow-row/>
+        <flow-row/>
+        <flow-row/>
       </div>
       <div class="menu-position">
         <button class="button red-letter" @click="start">
           START
         </button>
+        <flow-row/>
+        <flow-row/>
         <flow-row/>
         <flow-row/>
         <flow-row/>
@@ -171,8 +175,8 @@ button.button {
   font-family: VCR;
   background: none;
   border: none;
-  font-size: 42px;
-  margin: 1px 5px;
+  font-size: 3.2em;
+  margin: 0;
   //color: rgba(245, 163, 147, 0.9);
   color: hsla(0, 0, 147, 0.9);
   padding: 0;

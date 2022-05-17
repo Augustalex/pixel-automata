@@ -28,10 +28,10 @@ const output = computed(() => {
   background: none;
   border: none;
   font-size: 3.2em;
-  margin: .1em .2em;
   //color: rgba(245, 163, 147, 0.9);
   color: hsla(0, 0, 147, 0.9);
   padding: 0;
+  margin: 0;
 
   animation-name: example;
   animation-delay: v-bind(delay);

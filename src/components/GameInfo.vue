@@ -39,5 +39,6 @@ const population = computed(() => {
 h1 {
   font-size: 1.4em;
   letter-spacing: .2em;
+  user-select: none;
 }
 </style>

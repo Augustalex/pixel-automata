@@ -40,6 +40,6 @@ export function SimulateHumidifiers() {
         }
 
         const finalHumidity = Math.max(0, humidity);
-        gameState.info.humidity = (finalHumidity / pixels.length);
+        gameState.info.humidity = (finalHumidity / pixels.length) * 1.1;
     }
 }

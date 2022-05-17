@@ -46,7 +46,7 @@ const tiles = computed(() => {
   <div class="drawer-container">
     <div class="drawer">
       <span class="drawer-title">TOOLS</span>
-      <pixel-icon v-for="tile in tiles" :key="tile.title" :tile="tile" class="drawer-icon"/>
+      <pixel-icon v-for="tile in tiles" :key="tile.title" :tile="tile" class="drawer-icon" @dragstart.prevent/>
     </div>
   </div>
 </template>
@@ -63,6 +63,7 @@ const tiles = computed(() => {
 .drawer-title {
   margin-bottom: .5em;
   display: inline-block;
+  user-select: none;
 }
 
 .drawer {
@@ -87,5 +88,6 @@ const tiles = computed(() => {
   }
 
   transition: opacity .05s ease-out;
+  user-select: none;
 }
 </style>
