@@ -2,51 +2,25 @@
 import PixelIcon from "@/components/pixel-icon";
 import {computed} from "vue";
 import {useGameState} from "@/gameState";
+import {useDrawerState} from "@/utils/useDrawerState";
 
 const gameState = useGameState();
+const drawerState = useDrawerState();
 
-const tiles = computed(() => {
-  const canBuildFarm = gameState.info.humidity > .15;
-  const canBuildCity = gameState.pixels.some(p => p.pixelType === 'farm');
-  const builtFirstCity = gameState.pixels.some(p => p.pixelType === 'city' || p.pixelType === 'zone-city');
-  return [
-    // {
-    //   title: 'grass'
-    // },
-    {
-      title: 'humidifier',
-      displayTitle: 'Humidifier'
-    },
-    canBuildFarm && {
-      title: 'farm',
-      displayTitle: 'Farm'
-    },
-    canBuildCity && {
-      title: 'road',
-      displayTitle: 'Road'
-    },
-    canBuildCity && {
-      title: 'zone-city',
-      displayTitle: 'City'
-    },
-    builtFirstCity && {
-      title: 'dig',
-      displayTitle: 'Dig'
-    },
-    builtFirstCity && {
-      title: 'raise',
-      displayTitle: 'Raise'
-    }
-  ].filter(i => !!i);
-});
-
+const tools = computed(() => drawerState.tools.value)
 </script>
 
 <template>
   <div class="drawer-container">
     <div class="drawer">
       <span class="drawer-title">TOOLS</span>
-      <pixel-icon v-for="tile in tiles" :key="tile.title" :tile="tile" class="drawer-icon" @dragstart.prevent/>
+      <pixel-icon
+          v-for="tile in tools"
+          :key="tile.title"
+          :tile="tile"
+          class="drawer-icon"
+          @dragstart.prevent
+      />
     </div>
   </div>
 </template>

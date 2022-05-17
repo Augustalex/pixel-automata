@@ -1,15 +1,24 @@
 <script setup>
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import {toCssHslColor} from "@/utils/toCssColor";
 import {iconColor} from "@/utils/iconColor";
 import {useCursor} from "@/useCursor";
+import {useGlobalGameClock} from "@/gameState";
 
 const props = defineProps({tile: Object});
 const cursor = useCursor();
+const gameClock = useGlobalGameClock();
 
-const css = computed(() => ({
-  background: toCssHslColor(iconColor(props.tile))
-}));
+const progress = ref(1);
+
+const cooldown = computed(() => Math.max(0, Math.min(1, (props.tile.cooldownUntil - gameClock.value) / props.tile.cooldownTime)));
+
+const css = computed(() => {
+  return ({
+    background: toCssHslColor(iconColor(props.tile)),
+    right: `${100 - Math.round((1 - cooldown.value) * 100)}%`
+  });
+});
 
 function onClick() {
   cursor.setHoldingItem(props.tile.title);
@@ -18,7 +27,8 @@ function onClick() {
 </script>
 <template>
   <div class="icon" @click="onClick">
-    {{ props.tile.displayTitle }}
+    <div class="icon-background"/>
+    <span class="icon-text">{{ props.tile.displayTitle }}</span>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -30,9 +40,24 @@ function onClick() {
   align-items: center;
   padding: .4em;
   color: white;
-  background: v-bind('css.background');
   transform: scale(1);
   transition: transform 1s ease-out;
   margin: 12px 0;
+  position: relative;
+}
+
+.icon-background {
+  background: v-bind('css.background');
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: v-bind('css.right');
+  z-index: 1;
+}
+
+.icon-text {
+  position: relative;
+  z-index: 2;
 }
 </style>

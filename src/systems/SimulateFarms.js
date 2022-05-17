@@ -1,5 +1,5 @@
 import {PixelDataView} from "@/utils/PixelDataView";
-import {transform} from "@/utils/transformers";
+import {getTransform} from "@/utils/transformers";
 
 export function SimulateFarms() {
     const view = PixelDataView();
@@ -17,7 +17,7 @@ export function SimulateFarms() {
             if (pixel.pixelType === 'farm') {
                 const water = view.getNeighbours(pixel, 5, p => p.pixelType === 'water');
                 if (water.length === 0) {
-                    transform(pixel, 'grass');
+                    getTransform(pixel, 'grass')?.(pixel);
                 }
             }
         }

@@ -1,6 +1,6 @@
 import {PixelDataView} from "@/utils/PixelDataView";
 import {useGameState} from "@/gameState";
-import {transform} from "@/utils/transformers";
+import {getTransformer} from "@/utils/transformers";
 
 export function SimulateWaterSpread() {
     const gameState = useGameState();
@@ -30,7 +30,7 @@ export function SimulateWaterSpread() {
         }
 
         for (let toMakeWaterElement of toMakeWater) {
-            transform(toMakeWaterElement, 'water');
+            getTransformer(toMakeWaterElement, 'water')?.(toMakeWaterElement);
         }
     }
 }
