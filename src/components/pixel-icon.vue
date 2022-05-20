@@ -16,7 +16,8 @@ const cooldown = computed(() => Math.max(0, Math.min(1, (props.tile.cooldownUnti
 const css = computed(() => {
   return ({
     background: toCssHslColor(iconColor(props.tile)),
-    right: `${100 - Math.round((1 - cooldown.value) * 100)}%`
+    right: `${100 - Math.round((1 - cooldown.value) * 100)}%`,
+    opacity: cursor.holdingItem.value === props.tile.title ? 1 : .2,
   });
 });
 
@@ -26,7 +27,7 @@ function onClick() {
 
 </script>
 <template>
-  <div class="icon" @click="onClick">
+  <div class="icon icon-hoverEffect" @click="onClick">
     <div class="icon-background"/>
     <span class="icon-text">{{ props.tile.displayTitle }}</span>
   </div>
@@ -40,10 +41,19 @@ function onClick() {
   align-items: center;
   padding: .4em;
   color: white;
-  transform: scale(1);
-  transition: transform 1s ease-out;
   margin: 12px 0;
   position: relative;
+
+  opacity: v-bind('css.opacity');
+
+  transition: opacity .1s ease-out;
+}
+
+.icon.icon-hoverEffect {
+  &:hover {
+    cursor: pointer;
+    opacity: 1;
+  }
 }
 
 .icon-background {
@@ -53,11 +63,19 @@ function onClick() {
   bottom: 0;
   left: 0;
   right: v-bind('css.right');
-  z-index: 1;
+  z-index: 0;
 }
 
 .icon-text {
-  position: relative;
   z-index: 2;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: 3px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

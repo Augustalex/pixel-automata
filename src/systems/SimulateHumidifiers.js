@@ -1,11 +1,15 @@
 import {PixelDataView} from "@/utils/PixelDataView";
 import {useGameState} from "@/gameState";
-import {getTransformer} from "@/utils/transformers";
+import {transform} from "@/utils/transformers";
+import {FarmHumidityThreshold} from "@/utils/useDrawerState";
+import {useNotifications} from "@/utils/useNotifications";
 
 export function SimulateHumidifiers() {
     const gameState = useGameState();
     const view = PixelDataView();
+    const notifications = useNotifications();
 
+    let hasAnnouncedFarmableMars = false;
     let running = false;
     let lastRunTime = Date.now();
 
@@ -25,7 +29,7 @@ export function SimulateHumidifiers() {
                 hasAnyHumidifier = true;
 
                 if (pixel.radius > 7) {
-                    getTransformer(pixel, 'grass')?.(pixel);
+                    transform(pixel, 'grass');
                 } else {
                     pixel.readyMeter += delta;
                     if (pixel.readyMeter >= 2) {
@@ -33,7 +37,7 @@ export function SimulateHumidifiers() {
                         pixel.readyMeter = 0;
                         const sands = view.getNeighboursCircular(pixel, pixel.radius, p => p.pixelType === 'sand');
                         for (let sand of sands) {
-                            getTransformer(sand, 'grass')?.(sand);
+                            transform(sand, 'grass');
                         }
                     }
                 }
@@ -42,7 +46,11 @@ export function SimulateHumidifiers() {
             }
         }
 
-        const finalHumidity = Math.max(0, humidity);
-        gameState.info.humidity = hasAnyHumidifier ? .05 : ((finalHumidity / pixels.length) * 1.1);
+        gameState.info.humidity = Math.max(hasAnyHumidifier ? .05 : 0, ((humidity / pixels.length) * 1.1));
+
+        if (gameState.info.humidity > FarmHumidityThreshold && !hasAnnouncedFarmableMars) {
+            hasAnnouncedFarmableMars = true;
+            notifications.farmable();
+        }
     }
 }

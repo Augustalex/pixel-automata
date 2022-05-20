@@ -1,6 +1,8 @@
 import {useGameState} from "@/gameState";
 import {computed, ref} from "vue";
 
+export const FarmHumidityThreshold = .15;
+
 const toolsUsedInfo = ref({});
 
 export function useDrawerState() {
@@ -20,7 +22,7 @@ export function useDrawerState() {
     }
 
     function getTools(showAll = false) {
-        const canBuildFarm = showAll || gameState.info.humidity > .15;
+        const canBuildFarm = showAll || gameState.info.humidity > FarmHumidityThreshold;
         const canBuildCity = showAll || gameState.pixels.some(p => p.pixelType === 'farm');
         const builtFirstCity = showAll || gameState.pixels.some(p => p.pixelType === 'city' || p.pixelType === 'zone-city');
         const cooldownInfos = toolsUsedInfo.value;
@@ -29,19 +31,19 @@ export function useDrawerState() {
                 title: 'humidifier',
                 displayTitle: 'Humidifier',
                 cooldownUntil: cooldownInfos['humidifier'] || 0,
-                cooldownTime: 3600,
+                cooldownTime: 1300,
             },
             canBuildFarm && {
                 title: 'farm',
                 displayTitle: 'Farm',
                 cooldownUntil: cooldownInfos['farm'] || 0,
-                cooldownTime: 1000,
+                cooldownTime: 500,
             },
             canBuildCity && {
                 title: 'road',
                 displayTitle: 'Road',
                 cooldownUntil: cooldownInfos['road'] || 0,
-                cooldownTime: 0,
+                cooldownTime: 300,
             },
             canBuildCity && {
                 title: 'zone-city',

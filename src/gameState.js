@@ -239,7 +239,7 @@ function GenerateWorld(width, height) {
         for (let pixel of pixels) {
             if (pixel.pixelType === 'sand') {
                 if (Math.random() < .3) continue;
-                if ((pixel.height > 7 || pixel.height < 2) && Math.random() > .3) continue;
+                if ((pixel.height > 7 || pixel.height < 3) && Math.random() > .3) continue;
                 const neighbours = getPixelsInRadius(pixel, 4);
                 const newHeight = Math.round(neighbours.reduce((acc, v) => acc + v.height, 0) / neighbours.length);
                 pixel.height = newHeight;

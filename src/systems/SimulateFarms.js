@@ -1,9 +1,12 @@
 import {PixelDataView} from "@/utils/PixelDataView";
-import {getTransform} from "@/utils/transformers";
+import {transform} from "@/utils/transformers";
+import {useNotifications} from "@/utils/useNotifications";
 
 export function SimulateFarms() {
     const view = PixelDataView();
+    const notifications = useNotifications();
 
+    let builtFirstFarm = false;
     const running = false;
 
     return {
@@ -17,7 +20,12 @@ export function SimulateFarms() {
             if (pixel.pixelType === 'farm') {
                 const water = view.getNeighbours(pixel, 5, p => p.pixelType === 'water');
                 if (water.length === 0) {
-                    getTransform(pixel, 'grass')?.(pixel);
+                    transform(pixel, 'grass');
+                } else {
+                    if (!builtFirstFarm) {
+                        builtFirstFarm = true;
+                        notifications.marsianMushrooms();
+                    }
                 }
             }
         }

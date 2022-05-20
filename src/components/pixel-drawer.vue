@@ -41,27 +41,12 @@ const tools = computed(() => drawerState.tools.value)
 }
 
 .drawer {
-  opacity: .4;
   padding: 90px;
   margin: -90px;
 
-  &:hover {
-    opacity: 1;
-  }
-
-  transition: opacity .2s ease-in;
 }
 
 .drawer-icon {
-  border: 3px solid white;
-  opacity: .6;
-
-  &:hover {
-    cursor: pointer;
-    opacity: 1;
-  }
-
-  transition: opacity .05s ease-out;
   user-select: none;
 }
 </style>

@@ -1,35 +1,48 @@
 <script setup>
 
-import {computed, onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {useNotifications} from "@/utils/useNotifications";
+import MarqueeBar from "@/components/MarqueeBar";
 import {useGlobalGameClock} from "@/gameState";
 
 const notifications = useNotifications();
 const gameClock = useGlobalGameClock();
 
+const messages = ref([]);
 const currentNotification = ref(null);
-
-// watch(() => gameClock.value, (current, old) => {
-//   if (!currentNotification.value) return;
-//   if (current - currentNotification.value.sent > 60 * 1000) {
-//     currentNotification.value = null;
+//
+// const css = computed(() => {
+//   if (!currentNotification.value) return {paddingRight: 0};
+//   const timePassed = (gameClock.value - currentNotification.value.sent);
+//   return {
+//     paddingRight: -(currentNotification.value.text.length * 20) + timePassed / 10
 //   }
 // });
+
+watch(() => gameClock.value, (current, old) => {
+  if (messages.value.length === 0) return;
+  messages.value = messages.value.filter(m => {
+    return current - m.sent <= 5 * 60 * 1000;
+  });
+});
+
 onMounted(() => {
-  notifications.onNotification(onNotificationSent)
-})
+  notifications.onNotification(onNotificationSent);
+});
 
 function onNotificationSent(allNotifications) {
-  const earliestNotificationKey = Object.keys(allNotifications).sort((ka, kb) => allNotifications[ka] - allNotifications[kb])[0];
-  console.log(earliestNotificationKey, allNotifications);
-  currentNotification.value = {text: notifications.textByKey(earliestNotificationKey), sent: Date.now()};
+  const earliestNotificationKey = Object.keys(allNotifications).sort((ka, kb) => allNotifications[kb] - allNotifications[ka])[0];
+  messages.value.unshift({text: notifications.textByKey(earliestNotificationKey), sent: Date.now()});
 }
 
-const messages = ref([]);
 </script>
 <template>
-  <div class="infoBar">
-    <marquee v-if="currentNotification" loop="1">{{ currentNotification.text }}</marquee>
+  <div v-if="messages.length > 0" class="infoBar">
+    <marquee-bar v-for="message in messages.filter((k, i) => i === 0)" :key="message.sent">
+      <span>{{
+          message.text
+        }}</span>
+    </marquee-bar>
   </div>
 </template>
 <style lang="scss" scoped>

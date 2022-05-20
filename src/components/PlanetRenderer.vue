@@ -8,12 +8,14 @@ import {toCssHslColor} from "@/utils/toCssColor";
 import {useGameInputController} from "@/utils/useGameInputController";
 import {useViewOffset} from "@/utils/useViewOffset";
 import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
+import {useCursor} from "@/useCursor";
 
 const gameState = useGameState();
 
 const running = ref(true);
 const canvasRef = ref(null);
 const gridController = useGridController();
+const cursor = useCursor();
 const gameInput = useGameInputController({target: canvasRef});
 const viewOffset = useViewOffset();
 const horizontalRotateAction = useHorizontalRotateAction();
@@ -50,11 +52,12 @@ onMounted(() => {
     gameInput.update({now, delta});
     viewOffset.update({now, delta});
 
+    const hoveringTile = cursor.hoveringTile.value;
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     for (const pixel of gameState.pixels) {
       const {x, y} = pixel.position;
-      context.fillStyle = colorToCss(color(pixel, gameState.info));
+      context.fillStyle = colorToCss(lighten(color(pixel, gameState.info), hoveringTile === pixel ? 1.4 : 1));
       const newX = Math.round(x * TileSize + viewOffsetX);
       context.fillRect(newX % viewOffset.worldLength() - TileSize, y * TileSize, TileSize, TileSize);
     }
@@ -65,6 +68,10 @@ onMounted(() => {
   }
 
   loop();
+
+  function lighten([h, s, l, a], factor) {
+    return [h, Math.min(s, s * (1 + ((factor - 1) / 2))), Math.min(100, l * factor), a];
+  }
 
   function color(pixel, worldInfo) {
     return darken(diffuse(getTileColor(pixel, worldInfo), 1), ((pixel.height) / 40) + .75);
@@ -95,7 +102,7 @@ onBeforeUnmount(() => {
     <div class="canvasOverlay"/>
   </div>
 </template>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .canvasWrapper {
   width: calc(v-bind('css.height'));
   height: calc(v-bind('css.height'));

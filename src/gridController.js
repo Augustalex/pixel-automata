@@ -1,5 +1,5 @@
 import {useCursor} from "@/useCursor";
-import {getTransformer} from "@/utils/transformers";
+import {getTransformer, transform} from "@/utils/transformers";
 import {useGameState} from "@/gameState";
 import {PixelDataView} from "@/utils/PixelDataView";
 import {useDrawerState} from "@/utils/useDrawerState";
@@ -13,13 +13,18 @@ export function useGridController() {
     const lastTileMouseDown = null;
 
     return {
+        onTileHover,
         onTileClicked,
         onCancel
     };
 
+    function onTileHover(tile) {
+        cursor.setHoveringTile(tile);
+    }
+
     function onCancel(tile) {
         if (tile.pixelType === 'road') {
-            getTransformer(tile, tile.roadSurface)?.(tile);
+            transform(tile, tile.roadSurface);
         } else {
             cursor.setHoldingItem('');
         }
@@ -47,7 +52,7 @@ export function useGridController() {
 
             if (tile.height > waterLevel) {
                 const nearbyGrass = view.getNeighbours(tile, 3, p => p.pixelType === 'grass');
-                getTransformer(tile, nearbyGrass.length > 0 ? 'grass' : 'sand')?.(tile);
+                transform(tile, nearbyGrass.length > 0 ? 'grass' : 'sand');
             }
 
             drawerState.toolUsed(item);

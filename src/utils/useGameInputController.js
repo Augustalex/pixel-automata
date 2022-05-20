@@ -1,4 +1,4 @@
-import {TileSize} from "@/utils/constants";
+import {TileSize, WorldWidth} from "@/utils/constants";
 import {useViewOffset} from "@/utils/useViewOffset";
 import {ref} from "vue";
 import {useGameState} from "@/gameState";
@@ -76,17 +76,16 @@ export function useGameInputController({target}) {
     }
 
     function onMouseMove(e) {
-        const preX = e.offsetX - viewOffset.get().value;
-        const postX = preX < 0 ? viewOffset.worldLength() + preX : preX;
-        const newX = Math.round((postX) / TileSize);
-        const offsetX = newX;
+        const xOffsetWithinView = e.offsetX - viewOffset.get().value;
+        const xOffsetAsTile = (xOffsetWithinView / TileSize) + 1;
+        const offsetX = Math.ceil(xOffsetAsTile < 0 ? ((WorldWidth)) + xOffsetAsTile : xOffsetAsTile) - 1;
         const offsetY = Math.floor(e.offsetY / TileSize);
 
         if (offsetX !== lastX.value || offsetY !== lastY.value) {
             const tileAtPosition = gameState.pixels.find(p => {
                 return p.position.x === offsetX && p.position.y === offsetY;
             });
-            lastTile.value = tileAtPosition;
+            lastTile.value = tileAtPosition || null;
         }
 
         lastX.value = offsetX;
@@ -98,6 +97,10 @@ export function useGameInputController({target}) {
             const speed = Math.max(0, Math.min(1, Math.abs(e.movementX) / 100)) * 2;
             mouseMoving.value = {speed, x: e.movementX, time: Date.now() + scrollTime};
             rotateAction.rotate((e.movementX > 0 ? 1 : -1) * speed, Date.now() + 250)
+        } else {
+            if (lastTile.value) {
+                gridController.onTileHover(lastTile.value);
+            }
         }
     }
 

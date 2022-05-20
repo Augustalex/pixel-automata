@@ -1,16 +1,18 @@
 import {useGameClock} from "@/gameState";
 import {PixelDataView} from "@/utils/PixelDataView";
-import {fromCityToGrass, fromGrassToCity, transform} from "@/utils/transformers";
-import {Tags} from "@/utils/constants";
+import {fromGrassToCity} from "@/utils/transformers";
+import {useNotifications} from "@/utils/useNotifications";
 
 export function SimulateCities() {
     const view = PixelDataView();
     const time = useGameClock();
+    const notifications = useNotifications();
 
     let nextRun = 0;
     let iterationId = 'a';
     let loopCount = 0;
     let running = false;
+    let lastComplainedAboutFood = 0;
 
     const farmCountByRoadNetwork = new Map();
     const cityTilesByCityId = new Map();
@@ -20,7 +22,7 @@ export function SimulateCities() {
         running: () => running
     };
 
-    function run({delta, pixels}) {
+    function run({delta, now, pixels}) {
         running = true;
         // if (time.value < nextRun) return;
         // nextRun = time.value + 1;
@@ -71,27 +73,25 @@ export function SimulateCities() {
         if (loopCount === 2) {
             const toMakeGrass = [];
 
-            for (let pixel of pixels) {
-                if (pixel.pixelType !== 'city') continue;
-                const roadsIds = new Set(view.getNeighbours(pixel, 12, p => 'road' === p.pixelType).map(p => p.roadId));
+            for (const cityId of cityTilesByCityId.keys()) {
+                const cityTiles = cityTilesByCityId.get(cityId);
+                const roadsIds = new Set();
+                for (let cityTile of cityTiles) {
+                    roadsIds.add(...view.getNeighbours(cityTile, 12, p => 'road' === p.pixelType).map(p => p.roadId));
+                }
+
                 let totalFarms = 0;
                 for (let roadId of roadsIds) {
                     totalFarms += (farmCountByRoadNetwork.get(roadId) || 0);
                 }
 
-                const cityId = pixel.cityId;
-                const tiles = cityTilesByCityId.get(cityId) || [];
-                // const farmRequirement = tiles.reduce((acc, v) => acc + farmRequirementByCityLevel(v.cityLevel), 0);
-                const farmRequirement = tiles.length;
+                // const farmRequirement = cityTiles.reduce((acc, v) => acc + farmRequirementByCityLevel(v.cityLevel), 0);
+                const farmRequirement = cityTiles.length;
                 const farmCount = totalFarms;
 
                 if (farmCount < farmRequirement) {
-                    const sortedTiles = tiles.sort((a, b) => a.cityLevel - b.cityLevel);
-
                     let tally = 0;
-                    for (let t of sortedTiles) {
-                        // if (t.cityLevel > 1) continue;
-
+                    for (let t of cityTiles) {
                         tally += 1;
                         if (tally >= (farmRequirement - farmCount)) {
                             break;
@@ -102,17 +102,28 @@ export function SimulateCities() {
                         }
                     }
                 } else if (farmCount > farmRequirement + 1) {
-                    const grass = view.getNeighbours(pixel, 3, p => p.pixelType === 'grass');
-                    if (grass.length > 0) {
-                        const anyGrass = grass[Math.round(Math.random() * (grass.length - 1))];
-                        fromGrassToCity(anyGrass);
-                        anyGrass.cityId = cityId;
+                    for (let cityTile of cityTiles) {
+                        const grass = view.getNeighbours(cityTile, 3, p => p.pixelType === 'grass');
+                        if (grass.length > 0) {
+                            const anyGrass = grass[Math.round(Math.random() * (grass.length - 1))];
+                            fromGrassToCity(anyGrass);
+                            anyGrass.cityId = cityId;
+
+                            break;
+                        }
                     }
                 }
             }
 
             if (toMakeGrass.length > 3) {
-                console.log("people are starving!")
+                const dateNow = Date.now();
+                if (dateNow - lastComplainedAboutFood > 5 * 60 * 1000) {
+                    const settlementNotification = notifications.getNotifications()['settlement'];
+                    if (!settlementNotification || (dateNow - settlementNotification) > 60 * 1000) {
+                        notifications.starving();
+                        lastComplainedAboutFood = dateNow;
+                    }
+                }
             }
             // for (let toGrass of toMakeGrass) {
             //     if (Math.random() > .5) continue;

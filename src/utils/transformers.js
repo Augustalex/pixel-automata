@@ -1,5 +1,5 @@
 export {
-    fromGrassToCity, fromGrassToDeadGrass, fromCityToGrass, fromGrassToHumidifier, getTransformer
+    fromGrassToCity, fromGrassToDeadGrass, fromCityToGrass, fromGrassToHumidifier, getTransformer, transform
 }
 
 function noop() {
@@ -7,7 +7,10 @@ function noop() {
 }
 
 function transform(pixel, toType) {
-    getTransformer(pixel, toType)(pixel);
+    const transformer = getTransformer(pixel, toType);
+    if (transformer) {
+        transformer(pixel);
+    }
 }
 
 function getTransformer(pixel, toType) {
