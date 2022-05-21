@@ -12,11 +12,10 @@ export function getTileColor(pixel, worldInfo) {
             ]
         }
 
-        const saturationByHeight = pixel.height * 4 + 20;
         return [
             120,
-            saturationByHeight + .25 * variation,
-            saturationByHeight + .25 * variation,
+            20 + pixel.height * 4 + .25 * variation,
+            35 + pixel.height * 3 + .25 * variation,
             1
         ];
     }
@@ -29,11 +28,10 @@ export function getTileColor(pixel, worldInfo) {
             ]
         }
 
-        const height = pixel.height * 5 + 20;
         return [
             25 + .25 * variation,
-            height + .25 * variation,
-            height + .25 * variation,
+            30 + pixel.height * 4 + .25 * variation,
+            35 + pixel.height * 3 + .25 * variation,
             // height,
             // applyVariation(height, 2, variation),
             1
@@ -52,12 +50,12 @@ export function getTileColor(pixel, worldInfo) {
         1
     ];
     if (pixel.pixelType === 'water') {
-        const height = pixel.height * 5;
         const lightnessVariation = (pixel.streamY); //tops out at 20
         return [
             190 - 5 + lightnessVariation * .5,
-            30 + height,
-            20 + height + lightnessVariation,
+            // 40 + pixel.height * 3,
+            (( Math.max(0, Math.min(80, 70 + pixel.height * 2 + lightnessVariation)) / 100) )* 100,
+            (easeOutQuint( Math.max(0, Math.min(50, 10 + pixel.height * 2.5 + lightnessVariation / 3)) / 100) )* 100,
             1
         ];
     }
@@ -89,4 +87,19 @@ function applyVariation(value, degree, variation, MAX_VARIATION = 10) {
     const startColor = Math.max(value - degree * MAX_VARIATION, degree * MAX_VARIATION)
 
     return startColor + degree * variation;
+}
+
+function easeOutCirc(x) {
+    return Math.sqrt(1 - Math.pow(x - 1, 2));
+}
+
+function easeOutSine(x) {
+    return Math.sin((x * Math.PI) / 2);
+}
+
+function easeOutQuint(x) {
+    return 1 - Math.pow(1 - x, 5);
+}
+function easeInOutSine(x) {
+    return -(Math.cos(Math.PI * x) - 1) / 2;
 }

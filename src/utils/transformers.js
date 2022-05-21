@@ -54,9 +54,9 @@ function getTransformer(pixel, toType) {
         if (toType === 'grass') {
             return () => standardTransform(pixel, 'grass');
         }
-        // if (toType === 'sand') {
-        //     return () => standardTransform(pixel, 'sand');
-        // }
+        if (toType === 'sand') {
+            return () => standardTransform(pixel, 'sand');
+        }
     } else if (pixel.pixelType === 'humidifier') {
         if (toType === 'water') {
             return () => standardTransform(pixel, 'water');

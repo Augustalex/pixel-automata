@@ -234,14 +234,15 @@ function GenerateWorld(width, height) {
         }
     }
 
-    const passes = 12;
+    const passes = 2;
     for (let i = 0; i < passes; i++) {
         for (let pixel of pixels) {
             if (pixel.pixelType === 'sand') {
-                if (Math.random() < .3) continue;
-                if ((pixel.height > 7 || pixel.height < 3) && Math.random() > .3) continue;
+                if (pixel.height === 0 && Math.random() < .1) continue;
+                // if (Math.random() < .3) continue;
+                // if ((pixel.height > 7 || pixel.height <= 3) && Math.random() > .3) continue;
                 const neighbours = getPixelsInRadius(pixel, 4);
-                const newHeight = Math.round(neighbours.reduce((acc, v) => acc + v.height, 0) / neighbours.length);
+                const newHeight = Math.round(neighbours.reduce((acc, v) => acc + easeInOutSine(v.height / 10) * 10, 0) / neighbours.length);
                 pixel.height = newHeight;
             }
         }
@@ -273,7 +274,7 @@ function GenerateWorld(width, height) {
         return {
             pixelType: 'sand',
             variation: Math.round(Math.random() * 10),
-            height: Math.round(Math.random() * 10),
+            height: Math.round(easeInOutSine(Math.random()) * 10),
             position: {x, y},
             age: 0,
             streamY: 0,
@@ -284,4 +285,16 @@ function GenerateWorld(width, height) {
     function key(pixel) {
         return `${pixel.position.x}:${pixel.position.y}`;
     }
+}
+
+function easeInOutCubic(x) {
+    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+
+function easeOutCubic(x) {
+    return 1 - Math.pow(1 - x, 3);
+}
+
+function easeInOutSine(x) {
+    return -(Math.cos(Math.PI * x) - 1) / 2;
 }
