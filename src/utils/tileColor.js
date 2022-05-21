@@ -3,6 +3,15 @@ import {iconColor} from "@/utils/iconColor";
 export function getTileColor(pixel, worldInfo) {
     const variation = pixel.variation;
     const [baseHue, baseSaturation, baseLightness] = iconColor({title: pixel.pixelType});
+    if (pixel.onFire) {
+        const height = pixel.height;
+        const variation = Math.random() * 1.5;
+        return [
+            15,
+            50 + height * 2 + variation,
+            40 + height * 2 + variation
+        ]
+    }
     if (pixel.pixelType === 'grass') {
         if (pixel.height >= 9) {
             return [
@@ -54,8 +63,8 @@ export function getTileColor(pixel, worldInfo) {
         return [
             190 - 5 + lightnessVariation * .5,
             // 40 + pixel.height * 3,
-            (( Math.max(0, Math.min(80, 70 + pixel.height * 2 + lightnessVariation)) / 100) )* 100,
-            (easeOutQuint( Math.max(0, Math.min(50, 10 + pixel.height * 2.5 + lightnessVariation / 3)) / 100) )* 100,
+            ((Math.max(0, Math.min(80, 70 + pixel.height * 2 + lightnessVariation)) / 100)) * 100,
+            (easeOutQuint(Math.max(0, Math.min(50, 10 + pixel.height * 2.5 + lightnessVariation / 3)) / 100)) * 100,
             1
         ];
     }
@@ -100,6 +109,7 @@ function easeOutSine(x) {
 function easeOutQuint(x) {
     return 1 - Math.pow(1 - x, 5);
 }
+
 function easeInOutSine(x) {
     return -(Math.cos(Math.PI * x) - 1) / 2;
 }

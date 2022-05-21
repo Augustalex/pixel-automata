@@ -6,6 +6,7 @@ import {SimulateHumidifiers} from "@/systems/SimulateHumidifiers";
 import {SimulateWaterSpread} from "@/systems/SimulateWaterSpread";
 import {SimulateFarms} from "@/systems/SimulateFarms";
 import {ZoneSystem} from "@/systems/ZoneSystem";
+import {SimulatePollution} from "@/systems/SimulatePolution";
 
 const _gameClock = ref(0);
 const _state = reactive({
@@ -15,6 +16,7 @@ const _state = reactive({
         height: WorldHeight,
     },
     info: {
+        averageTemperature: 0,
         humidity: 0,
     },
     pixels: GenerateWorld(WorldWidth, WorldHeight)
@@ -111,7 +113,8 @@ function DefaultModules() {
         SimulateHumidifiers(),
         SimulateWaterSpread(),
         SimulateFarms(),
-        ZoneSystem()
+        ZoneSystem(),
+        SimulatePollution()
     ];
 }
 

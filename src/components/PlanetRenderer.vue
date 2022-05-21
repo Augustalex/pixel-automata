@@ -74,7 +74,17 @@ onMounted(() => {
   }
 
   function color(pixel, worldInfo) {
-    return darken(diffuse(getTileColor(pixel, worldInfo), 1), ((pixel.height) / 40) + .75);
+    return darken(addPollution(getTileColor(pixel, worldInfo), pixel), (((pixel.height) / 10) * .2) + .8);
+  }
+
+  function addPollution([h, s, l, a], pixel) {
+    if (!pixel.pollution) return [h, s, l, a];
+    return [
+      h,
+      Math.max(0, Math.min(100, s - 50 * pixel.pollution.level)),
+      l,
+      a
+    ]
   }
 
   function diffuse([red, green, blue, alpha = 1], factor) {

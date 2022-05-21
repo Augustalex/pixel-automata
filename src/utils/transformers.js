@@ -37,6 +37,9 @@ function getTransformer(pixel, toType) {
         if (toType === 'zone-city') {
             return zoneTransform(toType);
         }
+        if (toType === 'sand') {
+            return fromAnyToSand;
+        }
     } else if (pixel.pixelType === 'sand') {
         if (toType === 'humidifier') {
             return fromGrassToHumidifier;
@@ -74,6 +77,9 @@ function getTransformer(pixel, toType) {
         }
         if (toType === 'grass') {
             return () => standardTransform(pixel, toType);
+        }
+        if (toType === 'sand') {
+            return fromAnyToSand;
         }
     } else if (pixel.pixelType === 'road') {
         if (toType === 'grass') {
@@ -154,6 +160,10 @@ function fromAnyToRoad(pixel) {
     pixel.roadSurface = pixel.pixelType;
 
     standardTransform(pixel, 'road');
+}
+
+function fromAnyToSand(pixel) {
+    standardTransform(pixel, 'sand');
 }
 
 function zoneTransform(toType) {

@@ -97,10 +97,10 @@ export function useGameInputController({target}) {
             const speed = Math.max(0, Math.min(1, Math.abs(e.movementX) / 100)) * 2;
             mouseMoving.value = {speed, x: e.movementX, time: Date.now() + scrollTime};
             rotateAction.rotate((e.movementX > 0 ? 1 : -1) * speed, Date.now() + 250)
-        } else {
-            if (lastTile.value) {
-                gridController.onTileHover(lastTile.value);
-            }
+        }
+
+        if (lastTile.value) {
+            gridController.onTileHover(lastTile.value);
         }
     }
 
