@@ -38,7 +38,7 @@ export function useViewOffset() {
                 const newOffset = (viewOffset.value + offset) % worldLength();
                 viewOffset.value = (newOffset < 0 ? worldLength() + newOffset : newOffset);
             }
-        } else {
+        } else if (rotateAction.autoRotate.value) {
             viewOffset.value = (viewOffset.value + (10 * delta)) % worldLength();
         }
     }

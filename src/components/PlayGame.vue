@@ -6,6 +6,7 @@ import {useMousePosition} from "@/useMousePosition";
 import GameInfo from "@/components/GameInfo";
 import PlanetRenderer from "@/components/PlanetRenderer";
 import InfoBar from "@/components/InfoBar";
+import GameSettings from "@/components/GameSettings";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
@@ -98,6 +99,7 @@ const css = computed(() => ({
 
 <template>
   <!--  <game-cursor/>-->
+  <game-settings/>
   <div class="playArea">
     <pixel-drawer class="playArea-left"/>
     <planet-renderer class="playArea-middle"/>
@@ -106,7 +108,7 @@ const css = computed(() => ({
     <!--    </div>-->
     <game-info class="playArea-right"/>
   </div>
-  <info-bar />
+  <info-bar/>
 </template>
 
 <style lang="scss" scoped>
