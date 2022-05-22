@@ -8,30 +8,22 @@ import {SimulateFarms} from "@/systems/SimulateFarms";
 import {ZoneSystem} from "@/systems/ZoneSystem";
 import {SimulatePollution} from "@/systems/SimulatePolution";
 
+const SPEEDS = {
+    paused: 0, normal: 1, fast: 2, bonkers: 8
+};
+const _simulationSpeed = ref(SPEEDS.normal);
+const _simulation = ref(null);
+
 const _gameClock = ref(0);
 const _state = reactive({
     worldData: {
-        tileSize: TileSize,
-        width: WorldWidth,
-        height: WorldHeight,
-    },
-    info: {
-        averageTemperature: 0,
-        humidity: 0,
-    },
-    pixels: GenerateWorld(WorldWidth, WorldHeight)
+        tileSize: TileSize, width: WorldWidth, height: WorldHeight,
+    }, info: {
+        averageTemperature: 0, humidity: 0,
+    }, pixels: GenerateWorld(WorldWidth, WorldHeight)
 });
 
 export const useGlobalGameClock = () => {
-    if (_gameClock.value === 0) {
-        const loop = () => {
-            _gameClock.value = Date.now();
-
-            requestAnimationFrame(loop);
-        };
-        loop();
-    }
-
     return _gameClock;
 };
 export const useGameClock = () => _gameClock;
@@ -48,74 +40,96 @@ window.fpsCounter = () => {
     }, 800);
 }
 
+export function useSimulation() {
+    if (!_simulation.value) _simulation.value = Simulation();
+
+    return _simulation;
+}
+
 export function Simulation({modules} = {modules: DefaultModules()}) {
-    let timeoutId;
+    const gameClock = useGlobalGameClock();
     let systemIndex = 0;
+    let systemCountdown = 0;
+
+    let startedMainLoop = false;
 
     return {
-        start,
-        stop,
-        isRunning
+        start, stop, isRunning, speeds: SPEEDS, getSpeed, setSpeed
     };
 
+    function getSpeed() {
+        return _simulationSpeed.value;
+    }
+
+    function setSpeed(speedValue) {
+        _simulationSpeed.value = speedValue;
+    }
+
     function start() {
-        let previousTime = Date.now();
+        setSpeed(SPEEDS.normal)
+
+        if (startedMainLoop) return;
+        startedMainLoop = true;
+
+        let previousActualTime = Date.now();
 
         const loop = () => {
-            const start = performance.now();
-            const currentTime = Date.now();
-            const delta = (currentTime - previousTime) / 1000;
-            _gameClock.value = (_gameClock.value + delta);
+            if (_simulationSpeed.value !== SPEEDS.paused) {
+                const start = performance.now();
 
-            const moduleProps = {now: currentTime, delta, pixels: _state.pixels};
+                const currentActualTime = Date.now();
+                const actualDelta = currentActualTime - previousActualTime;
+                const delta = (actualDelta / 1000) * _simulationSpeed.value;
+                _gameClock.value += delta;
 
-            const runningModule = modules.find(m => !m.alwaysRun && m.running());
-            if (!runningModule) {
-                systemIndex += 1;
-                if (systemIndex >= modules.length) {
-                    systemIndex = 0;
+                if (systemCountdown <= 0) {
+                    const moduleProps = {now: gameClock.value, delta, pixels: _state.pixels};
+
+                    const runningModule = modules.find(m => !m.alwaysRun && m.running());
+                    if (!runningModule) {
+                        systemIndex += 1;
+                        if (systemIndex >= modules.length) {
+                            systemIndex = 0;
+                        }
+                    }
+                    modules[systemIndex].run(moduleProps);
+
+                    for (let alwaysRunModule of modules.filter(m => m.alwaysRun)) {
+                        alwaysRunModule.run(moduleProps)
+                    }
+
+                    systemCountdown = 250 / _simulationSpeed.value;
+                } else {
+                    systemCountdown -= actualDelta;
                 }
+
+
+                frameTimeBuffer.push(performance.now() - start);
+
+                if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
+
+                previousActualTime = currentActualTime;
             }
-            modules[systemIndex].run(moduleProps);
 
-            for (let alwaysRunModule of modules.filter(m => m.alwaysRun)) {
-                alwaysRunModule.run(moduleProps)
-            }
-
-
-            frameTimeBuffer.push(performance.now() - start);
-
-            if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
-
-            previousTime = currentTime;
-            timeoutId = setTimeout(loop, 250);
+            requestAnimationFrame(loop);
         };
 
         loop();
     }
 
     function stop() {
-        clearTimeout(timeoutId);
-        timeoutId = undefined;
+        setSpeed(SPEEDS.paused);
     }
 
     function isRunning() {
-        return timeoutId !== undefined;
+        return _simulationSpeed.value !== SPEEDS.paused;
     }
 }
 
 function DefaultModules() {
-    return [
-        // SimulateGrassGrowth(),
+    return [// SimulateGrassGrowth(),
         // SimulateGlobalWarming(),
-        SimulateCities(),
-        SimulateStreams(),
-        SimulateHumidifiers(),
-        SimulateWaterSpread(),
-        SimulateFarms(),
-        ZoneSystem(),
-        SimulatePollution()
-    ];
+        SimulateCities(), SimulateStreams(), SimulateHumidifiers(), SimulateWaterSpread(), SimulateFarms(), ZoneSystem(), SimulatePollution()];
 }
 
 function SimulateGrassGrowth() {

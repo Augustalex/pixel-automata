@@ -119,10 +119,10 @@ export function SimulateCities() {
             }
 
             if (toMakeGrass.length > 3) {
-                const dateNow = Date.now();
-                if (dateNow - lastComplainedAboutFood > 5 * 60 * 1000) {
+                const dateNow = time.value;
+                if (dateNow - lastComplainedAboutFood > 5 * 60) {
                     const settlementNotification = notifications.getNotifications()['settlement'];
-                    if (!settlementNotification || (dateNow - settlementNotification) > 60 * 1000) {
+                    if (!settlementNotification || (dateNow - settlementNotification) > 60) {
                         notifications.starving();
                         lastComplainedAboutFood = dateNow;
                     }

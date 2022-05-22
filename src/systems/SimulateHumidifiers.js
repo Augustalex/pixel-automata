@@ -1,17 +1,18 @@
 import {PixelDataView} from "@/utils/PixelDataView";
-import {useGameState} from "@/gameState";
+import {useGameClock, useGameState} from "@/gameState";
 import {transform} from "@/utils/transformers";
 import {FarmHumidityThreshold} from "@/utils/useDrawerState";
 import {useNotifications} from "@/utils/useNotifications";
 
 export function SimulateHumidifiers() {
+    const gameClock = useGameClock();
     const gameState = useGameState();
     const view = PixelDataView();
     const notifications = useNotifications();
 
     let hasAnnouncedFarmableMars = false;
     let running = false;
-    let lastRunTime = Date.now();
+    let lastRunTime = gameClock.value;
 
     return {
         run,
@@ -20,7 +21,7 @@ export function SimulateHumidifiers() {
     };
 
     function run({now, pixels}) {
-        const delta = (now - lastRunTime) / 1000;
+        const delta = (now - lastRunTime);
 
         let hasAnyHumidifier = false;
         let humidity = 0;

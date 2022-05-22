@@ -32,17 +32,17 @@ export function SimulatePollution() {
             } else {
                 const pollution = pixel.pollution;
 
-                if (reachedFireThreshold && pollution && Math.random() < .5) {
+                if (reachedFireThreshold && pollution && Math.random() < .6) {
                     delete pixel.pollution;
                     pixel.onFire = {fuel: 10};
                     totalHeat += 9;
 
                     transform(pixel, 'sand');
 
-                    const neighbours = view.getNeighbours(pixel, 3, p => !p.onFire && Math.random() < .5);
+                    const neighbours = view.getNeighbours(pixel, 3, p => !p.onFire && Math.random() < .8);
 
                     for (let neighbour of neighbours) {
-                        neighbour.onFire = {fuel: Math.random()};
+                        neighbour.onFire = {fuel: Math.random() * 2};
                         transform(neighbour, 'sand');
                     }
                 } else {
@@ -57,6 +57,10 @@ export function SimulatePollution() {
                         if (pollution) {
                             pixel.pollution.level = Math.max(0, pollution.level - delta * .5);
                         }
+                    } else if (pixel.pixelType === 'farm') {
+                        if (pollution && pollution.level > 2) {
+                            transform(pixel, 'sand');
+                        }
                     }
 
                     if (pollution) {
@@ -64,22 +68,24 @@ export function SimulatePollution() {
                         totalHeat += level;
 
                         if (level > 2) {
-                            let total = level;
-                            const neighbours = view.getNeighbours(pixel, 5, p => !p.pollution || p.pollution.level < 2);
+                            if (Math.random() < .3) {
+                                let total = level;
+                                const neighbours = view.getNeighbours(pixel, 5, p => (!p.pollution || p.pollution.level < 2) && Math.random() < .3);
 
-                            for (let neighbour of neighbours) {
-                                if (!neighbour.pollution) {
-                                    neighbour.pollution = {level: 0};
+                                for (let neighbour of neighbours) {
+                                    if (!neighbour.pollution) {
+                                        neighbour.pollution = {level: 0};
+                                    }
+
+                                    const toTake = .1;
+                                    const canTake = Math.min(total, toTake);
+
+                                    neighbour.pollution.level += canTake;
+                                    total -= canTake;
                                 }
 
-                                const toTake = .1;
-                                const canTake = Math.min(total, toTake);
-
-                                neighbour.pollution.level += canTake;
-                                total -= canTake;
+                                pollution.level = total;
                             }
-
-                            pollution.level = total;
                         }
                     }
                 }

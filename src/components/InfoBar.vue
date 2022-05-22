@@ -32,7 +32,7 @@ onMounted(() => {
 
 function onNotificationSent(allNotifications) {
   const earliestNotificationKey = Object.keys(allNotifications).sort((ka, kb) => allNotifications[kb] - allNotifications[ka])[0];
-  messages.value.unshift({text: notifications.textByKey(earliestNotificationKey), sent: Date.now()});
+  messages.value.unshift({text: notifications.textByKey(earliestNotificationKey), sent: gameClock.value});
 }
 
 </script>

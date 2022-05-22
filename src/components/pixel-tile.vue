@@ -2,11 +2,12 @@
 import {computed} from "vue";
 import {useGridController} from "@/gridController";
 import {useCities} from "@/utils/Cities";
-import {getTileColor} from "@/utils/tileColor";
 import {TileSize, WorldWidth} from "@/utils/constants";
+import {useTileColor} from "@/utils/tileColor";
 
 const gridController = useGridController();
 const cities = useCities();
+const {getTileColor} = useTileColor();
 
 const tileSize = TileSize;
 const worldLength = WorldWidth * tileSize;

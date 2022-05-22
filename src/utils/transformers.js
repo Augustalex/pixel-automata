@@ -126,7 +126,7 @@ function fromGrassToFarm(pixel) {
     pixel.pixelType = 'farm';
     pixel.water = 0;
     pixel.age = undefined;
-    pixel.variation = 0;
+    pixel.variation = Math.round(Math.random() * 10);
 }
 
 function fromGrassToHumidifier(pixel) {

@@ -3,12 +3,13 @@ import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useGameState} from "@/gameState";
 import {TileSize, WorldHeight, WorldWidth} from "@/utils/constants";
 import {useGridController} from "@/gridController";
-import {getTileColor} from "@/utils/tileColor";
 import {toCssHslColor} from "@/utils/toCssColor";
 import {useGameInputController} from "@/utils/useGameInputController";
 import {useViewOffset} from "@/utils/useViewOffset";
 import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
 import {useCursor} from "@/useCursor";
+import {useViewFilter} from "@/utils/useViewFilter";
+import {useTileColor} from "@/utils/tileColor";
 
 const gameState = useGameState();
 
@@ -19,6 +20,8 @@ const cursor = useCursor();
 const gameInput = useGameInputController({target: canvasRef});
 const viewOffset = useViewOffset();
 const horizontalRotateAction = useHorizontalRotateAction();
+const viewFilter = useViewFilter();
+const {getTileColor} = useTileColor();
 
 const css = computed(() => ({
   width: `${WorldWidth * TileSize}px`,
@@ -46,7 +49,6 @@ onMounted(() => {
 
     const viewOffsetX = viewOffset.get().value;
 
-
     const now = Date.now();
     const delta = (now - lastNow) / 1000;
     gameInput.update({now, delta});
@@ -55,11 +57,26 @@ onMounted(() => {
     const hoveringTile = cursor.hoveringTile.value;
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
+
+    const showPollution = viewFilter.pollutionView.value;
+
     for (const pixel of gameState.pixels) {
       const {x, y} = pixel.position;
-      context.fillStyle = colorToCss(lighten(color(pixel, gameState.info), hoveringTile === pixel ? 1.4 : 1));
+
       const newX = Math.round(x * TileSize + viewOffsetX);
-      context.fillRect(newX % viewOffset.worldLength() - TileSize, y * TileSize, TileSize, TileSize);
+
+      const py = y * TileSize;
+      const px = newX % viewOffset.worldLength() - TileSize;
+
+      context.fillStyle = colorToCss(lighten(color(pixel, gameState.info), hoveringTile === pixel ? 1.4 : 1));
+      context.fillRect(px, py, TileSize, TileSize);
+
+      if (showPollution && pixel.pollution) {
+        context.fillStyle = `rgba(0,0,0, ${.15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / 2.5) * .8})`;
+        context.save();
+        context.fillRect(px, py, TileSize, TileSize);
+        context.restore();
+      }
     }
 
     lastNow = now;
@@ -74,7 +91,8 @@ onMounted(() => {
   }
 
   function color(pixel, worldInfo) {
-    return darken(addPollution(getTileColor(pixel, worldInfo), pixel), (((pixel.height) / 10) * .2) + .8);
+    const shadowFactor = viewFilter.heightMap.value ? (((pixel.height) / 10) * .2) + .8 : 1;
+    return darken(getTileColor(pixel, worldInfo), shadowFactor);
   }
 
   function addPollution([h, s, l, a], pixel) {
@@ -105,6 +123,26 @@ onBeforeUnmount(() => {
   gameInput.stop();
   running.value = false;
 })
+
+function easeInCirc(x) {
+  return 1 - Math.sqrt(1 - Math.pow(x, 2));
+}
+
+function easeOutCirc(x) {
+  return Math.sqrt(1 - Math.pow(x - 1, 2));
+}
+
+function easeOutSine(x) {
+  return Math.sin((x * Math.PI) / 2);
+}
+
+function easeOutQuint(x) {
+  return 1 - Math.pow(1 - x, 5);
+}
+
+function easeInOutSine(x) {
+  return -(Math.cos(Math.PI * x) - 1) / 2;
+}
 </script>
 <template>
   <div class="canvasWrapper">

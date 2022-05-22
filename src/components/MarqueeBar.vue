@@ -24,7 +24,6 @@
 
 .marquee__inner {
   height: 100%;
-  width: 100%;
   display: flex;
   transform: translate(var(--move-initial), 0);
   animation: marquee 30s linear normal forwards;

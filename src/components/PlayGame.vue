@@ -1,5 +1,5 @@
 <script setup>
-import {Simulation, useGameState} from "@/gameState";
+import {Simulation, useGameState, useSimulation} from "@/gameState";
 import {computed, onMounted, ref} from "vue";
 import PixelDrawer from "@/components/pixel-drawer";
 import {useMousePosition} from "@/useMousePosition";
@@ -19,6 +19,7 @@ const startingY = ref(yMax);
 const transitionLength = 4;
 const transitionTime = ref(0);
 const started = ref(false);
+const simulation = useSimulation();
 
 const yPosition = computed(() => `translateY(${startingY.value}px)`);
 const opacity = computed(() => `1`);
@@ -30,15 +31,14 @@ function getOpacity(transitionTime) {
 }
 
 onMounted(() => {
-  const simulation = Simulation();
-  simulation.start();
+  simulation.value.start();
 
   window.addEventListener('keydown', e => {
     if (e.key === 'p') {
-      if (simulation.isRunning()) {
-        simulation.stop();
+      if (simulation.value.isRunning()) {
+        simulation.value.stop();
       } else {
-        simulation.start();
+        simulation.value.start();
       }
     }
   });

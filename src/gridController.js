@@ -1,6 +1,6 @@
 import {useCursor} from "@/useCursor";
 import {getTransformer, transform} from "@/utils/transformers";
-import {useGameState} from "@/gameState";
+import {useGameState, useGlobalGameClock} from "@/gameState";
 import {PixelDataView} from "@/utils/PixelDataView";
 import {useDrawerState} from "@/utils/useDrawerState";
 
@@ -9,6 +9,7 @@ export function useGridController() {
     const gameState = useGameState();
     const view = PixelDataView();
     const drawerState = useDrawerState();
+    const gameClock = useGlobalGameClock();
 
     const lastTileMouseDown = null;
 
@@ -41,7 +42,7 @@ export function useGridController() {
     function useItemOnTile(tile) {
         const item = cursor.holdingItem.value;
         const tileDrawerInfo = drawerState.tools.value.find(t => t.title === item);
-        const now = Date.now();
+        const now = gameClock.value;
         const cooldown = Math.max(0, Math.min(1, (tileDrawerInfo.cooldownUntil - now) / tileDrawerInfo.cooldownTime));
         if (cooldown > 0) return;
 
