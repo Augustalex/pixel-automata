@@ -7,9 +7,11 @@ import GameInfo from "@/components/GameInfo";
 import PlanetRenderer from "@/components/PlanetRenderer";
 import InfoBar from "@/components/InfoBar";
 import GameSettings from "@/components/GameSettings";
+import {useTileSize} from "@/utils/useTileSize";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
+const {tileSize} = useTileSize();
 
 const offsetX = ref(20);
 
@@ -91,8 +93,8 @@ function easeInOutCubic(x) {
 }
 
 const css = computed(() => ({
-  gridWidth: `${gameState.worldData.width * gameState.worldData.tileSize}px`,
-  gridHeight: `${gameState.worldData.height * gameState.worldData.tileSize}px`,
+  gridWidth: `${gameState.worldData.width * tileSize.value}px`,
+  gridHeight: `${gameState.worldData.height * tileSize.value}px`,
 }));
 
 </script>

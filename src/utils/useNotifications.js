@@ -3,17 +3,30 @@ import {useGlobalSound} from "@/utils/useGlobalSound";
 
 const notifications = ref({});
 const listeners = ref([]);
+const lastPlayed = ref(0);
+const notificationQueue = ref([]);
+const loopStarted = ref(false)
 
 const textsByKey = {
-    mars: 'Water flowing on mars for the first time in billions of years!',
-    mushrooms: 'New mushroom business is shrooming on the surface of Mars.',
+    waterOnMars: 'Water flowing on mars for the first time in billions of years!',
+    marsianMushrooms: 'New mushroom business is shrooming on the surface of Mars.',
     farmable: 'Native Marsian plants soon a reality near water, says a popular interplanetary influencer.',
     settlement: '100 billionaires and 1 famous actor are the first people to settle permanently on Mars.',
-    starving: 'People are upset over the lack of food. But there is still plenty of cake.'
+    starving: 'People are upset over the lack of food. But there is still plenty of cake.',
+    pollutionRising: 'Rapid expansion of air-conditioned luxury habitats sees alarming increase in global pollution levels.',
+    warningPollution: 'Scientists warns of the combustible nature of some pollutants filling the air.',
+    catastrophicPollution: 'Young people - not even old enough to drink - fill the streets to protest against the catastrophic levels of pollution.',
+    hellToCome: 'Cultists preach "hell to come" as many predict the polluted atmosphere will catch fire in a not too distant future.',
+    hellFire: 'All communication with Mars lost as planet turns into a fire hell scape.'
 };
 
 export function useNotifications() {
     const globalSound = useGlobalSound();
+
+    if (!loopStarted.value) {
+        loopStarted.value = true;
+        queueLoop();
+    }
 
     return {
         waterOnMars,
@@ -21,11 +34,31 @@ export function useNotifications() {
         marsianMushrooms,
         settlement,
         starving,
+        pollutionRising,
+        warningPollution,
+        catastrophicPollution,
+        hellToCome,
+        hellFire,
         onNotification,
         removeNotificationListener,
         textByKey,
         getNotifications: () => notifications.value
     };
+
+    function queueLoop() {
+        const loop = () => {
+            const queue = notificationQueue.value;
+
+            if (queue.length > 0) {
+                const next = queue.shift();
+                notificationTemplate(next);
+
+                notificationQueue.value = queue;
+            }
+
+            setTimeout(loop, 5000);
+        }
+    }
 
     function textByKey(key) {
         return textsByKey[key];
@@ -40,42 +73,59 @@ export function useNotifications() {
     }
 
     function waterOnMars() {
-        if (notifications.value['mars']) return;
-
-        globalSound.play('/notification.mp3');
-        notifications.value = {...notifications.value, 'mars': Date.now()};
-        listeners.value.forEach(l => l(notifications.value));
+        notificationTemplate('waterOnMars');
     }
 
     function farmable() {
-        if (notifications.value['farmable']) return;
-
-        globalSound.play('/notification.mp3');
-        notifications.value = {...notifications.value, 'farmable': Date.now()};
-        listeners.value.forEach(l => l(notifications.value));
+        notificationTemplate('farmable')
     }
 
     function settlement() {
-        if (notifications.value['settlement']) return;
-
-        globalSound.play('/notification.mp3');
-        notifications.value = {...notifications.value, 'settlement': Date.now()};
-        listeners.value.forEach(l => l(notifications.value));
+        notificationTemplate('settlement');
     }
 
     function marsianMushrooms() {
-        if (notifications.value['mushrooms']) return;
-
-        globalSound.play('/notification.mp3');
-        notifications.value = {...notifications.value, 'mushrooms': Date.now()};
-        listeners.value.forEach(l => l(notifications.value));
+        notificationTemplate('marsianMushrooms');
     }
 
     function starving() {
-        if (notifications.value['starving']) return;
+        notificationTemplate('starving');
+    }
 
-        globalSound.play('/notification.mp3');
-        notifications.value = {...notifications.value, 'starving': Date.now()};
-        listeners.value.forEach(l => l(notifications.value));
+    function pollutionRising() {
+        notificationTemplate('pollutionRising');
+    }
+
+    function warningPollution() {
+        notificationTemplate('warningPollution');
+    }
+
+    function catastrophicPollution() {
+        notificationTemplate('catastrophicPollution');
+    }
+
+    function hellToCome() {
+        notificationTemplate('hellToCome');
+    }
+
+    function hellFire() {
+        notificationTemplate('hellFire');
+    }
+
+    function notificationTemplate(key) {
+        const timeSinceLastPlayedNotification = Date.now() - lastPlayed.value;
+        if (timeSinceLastPlayedNotification > 10 * 1000) {
+            lastPlayed.value = Date.now();
+            if (notifications.value[key]) return;
+
+            console.log('notifications.value[key]', notifications.value[key], key, notifications.value);
+            globalSound.play('/notification.mp3');
+            notifications.value = {...notifications.value, [key]: Date.now()};
+            listeners.value.forEach(l => l(notifications.value));
+        } else {
+            const queue = notificationQueue.value;
+            queue.push(key);
+            notificationQueue.value = queue;
+        }
     }
 }

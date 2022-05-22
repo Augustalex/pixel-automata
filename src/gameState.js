@@ -1,5 +1,5 @@
 import {reactive, ref} from "vue";
-import {TileSize, WorldHeight, WorldWidth} from "@/utils/constants";
+import {WorldHeight, WorldWidth} from "@/utils/constants";
 import {SimulateCities} from "@/systems/SimulateCities";
 import {SimulateStreams} from "@/systems/SimulateStreams";
 import {SimulateHumidifiers} from "@/systems/SimulateHumidifiers";
@@ -17,7 +17,7 @@ const _simulation = ref(null);
 const _gameClock = ref(0);
 const _state = reactive({
     worldData: {
-        tileSize: TileSize, width: WorldWidth, height: WorldHeight,
+        width: WorldWidth, height: WorldHeight,
     }, info: {
         averageTemperature: 0, humidity: 0,
     }, pixels: GenerateWorld(WorldWidth, WorldHeight)

@@ -38,7 +38,7 @@ function playAudioIfPaused() {
 <style lang="scss">
 
 #app {
-  font-size: 80%;
+  font-size: min(1vw, 1vh);
   font-family: VCR, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

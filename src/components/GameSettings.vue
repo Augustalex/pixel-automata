@@ -89,6 +89,11 @@ function togglePixelVariation() {
   </div>
 </template>
 <style lang="scss" scoped>
+
+button {
+  font-size: 2em;
+}
+
 .miscSettings-menu {
   position: absolute;
   top: 100%;

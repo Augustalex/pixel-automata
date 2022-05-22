@@ -2,15 +2,15 @@
 import {computed} from "vue";
 import {useGridController} from "@/gridController";
 import {useCities} from "@/utils/Cities";
-import {TileSize, WorldWidth} from "@/utils/constants";
+import {WorldWidth} from "@/utils/constants";
 import {useTileColor} from "@/utils/tileColor";
+import {useTileSize} from "@/utils/useTileSize";
 
 const gridController = useGridController();
 const cities = useCities();
 const {getTileColor} = useTileColor();
-
-const tileSize = TileSize;
-const worldLength = WorldWidth * tileSize;
+const {tileSize} = useTileSize();
+const worldLength = computed(() => WorldWidth * tileSize.value);
 
 const props = defineProps({
   pixel: Object,
@@ -34,9 +34,9 @@ const title = computed(() => {
 });
 
 const css = computed(() => ({
-  size: `${tileSize}px`,
-  left: `${(props.pixel.position.x * tileSize + props.offsetX) % worldLength}px`,
-  top: `${props.pixel.position.y * tileSize}px`,
+  size: `${tileSize.value}px`,
+  left: `${(props.pixel.position.x * tileSize.value + props.offsetX) % worldLength.value}px`,
+  top: `${props.pixel.position.y * tileSize.value}px`,
   border: `1px solid ${colorToCss(diffuse(color.value, .5))}`,
   background: colorToCss(color.value)
 }));

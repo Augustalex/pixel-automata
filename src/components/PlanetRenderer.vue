@@ -1,7 +1,7 @@
 <script setup>
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useGameState} from "@/gameState";
-import {TileSize, WorldHeight, WorldWidth} from "@/utils/constants";
+import {WorldHeight, WorldWidth} from "@/utils/constants";
 import {useGridController} from "@/gridController";
 import {toCssHslColor} from "@/utils/toCssColor";
 import {useGameInputController} from "@/utils/useGameInputController";
@@ -10,22 +10,25 @@ import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
 import {useCursor} from "@/useCursor";
 import {useViewFilter} from "@/utils/useViewFilter";
 import {useTileColor} from "@/utils/tileColor";
+import {useTileSize} from "@/utils/useTileSize";
+import {useCanvas} from "@/utils/useCanvas";
 
 const gameState = useGameState();
 
 const running = ref(true);
-const canvasRef = ref(null);
 const gridController = useGridController();
 const cursor = useCursor();
+const canvasRef = useCanvas();
 const gameInput = useGameInputController({target: canvasRef});
 const viewOffset = useViewOffset();
 const horizontalRotateAction = useHorizontalRotateAction();
 const viewFilter = useViewFilter();
 const {getTileColor} = useTileColor();
+const {tileSize} = useTileSize();
 
 const css = computed(() => ({
-  width: `${WorldWidth * TileSize}px`,
-  height: `${WorldHeight * TileSize}px`
+  width: `${WorldWidth * tileSize.value}px`,
+  height: `${WorldHeight * tileSize.value}px`
 }));
 
 const humidityValue = computed(() => {
@@ -35,11 +38,8 @@ const ringColor = computed(() => `inset 0 0 40px 20px ${toCssHslColor([23 + humi
 const atmosphereColor = computed(() => `inset 0 0 100px 300px ${toCssHslColor([23 + humidityValue.value, 20, 60, .1])}`);
 const boxShadow = computed(() => ringColor.value + ', ' + atmosphereColor.value);
 
-
 onMounted(() => {
   const canvas = canvasRef.value;
-  canvas.width = WorldHeight * TileSize;
-  canvas.height = WorldHeight * TileSize;
 
   gameInput.start();
 
@@ -63,18 +63,18 @@ onMounted(() => {
     for (const pixel of gameState.pixels) {
       const {x, y} = pixel.position;
 
-      const newX = Math.round(x * TileSize + viewOffsetX);
+      const newX = Math.round(x * tileSize.value + viewOffsetX);
 
-      const py = y * TileSize;
-      const px = newX % viewOffset.worldLength() - TileSize;
+      const py = y * tileSize.value;
+      const px = newX % viewOffset.worldLength() - tileSize.value;
 
       context.fillStyle = colorToCss(lighten(color(pixel, gameState.info), hoveringTile === pixel ? 1.4 : 1));
-      context.fillRect(px, py, TileSize, TileSize);
+      context.fillRect(px, py, tileSize.value, tileSize.value);
 
       if (showPollution && pixel.pollution) {
         context.fillStyle = `rgba(0,0,0, ${.15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / 2.5) * .8})`;
         context.save();
-        context.fillRect(px, py, TileSize, TileSize);
+        context.fillRect(px, py, tileSize.value, tileSize.value);
         context.restore();
       }
     }

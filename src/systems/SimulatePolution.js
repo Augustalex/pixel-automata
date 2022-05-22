@@ -1,14 +1,19 @@
 import {PixelDataView} from "@/utils/PixelDataView";
 import {useGameState} from "@/gameState";
 import {transform} from "@/utils/transformers";
+import {useNotifications} from "@/utils/useNotifications";
 
 export const FireThreshold = 4;
 
 export function SimulatePollution() {
     const gameState = useGameState();
     const view = PixelDataView();
+    const notifications = useNotifications();
 
     let running = false;
+
+    let pollutionWarningLevel = 0;
+
 
     return {
         run,
@@ -25,25 +30,30 @@ export function SimulatePollution() {
             if (pixel.onFire) {
                 pixel.onFire.fuel -= delta;
                 if (pixel.onFire.fuel <= 0) {
+                    console.log('stop fire');
                     delete pixel.onFire;
                 } else {
-                    totalHeat += 9;
+                    totalHeat += 99;
                 }
             } else {
                 const pollution = pixel.pollution;
 
-                if (reachedFireThreshold && pollution && Math.random() < .6) {
-                    delete pixel.pollution;
-                    pixel.onFire = {fuel: 10};
-                    totalHeat += 9;
+                const randomValue = Math.random();
+                if (reachedFireThreshold) {
+                    if ((pixel.pixelType !== 'sand' || randomValue < .01) && randomValue < .2 || (pollution && randomValue < .9)) {
+                        pixel.onFire = {fuel: pollution ? 5 : Math.random()};
+                        delete pixel.pollution;
+                        totalHeat += 99;
 
-                    transform(pixel, 'sand');
+                        transform(pixel, 'sand');
 
-                    const neighbours = view.getNeighbours(pixel, 3, p => !p.onFire && Math.random() < .8);
+                        const neighbours = view.getNeighbours(pixel, 5, p => p.pixelType !== 'sand' && !p.onFire && Math.random() < .8);
 
-                    for (let neighbour of neighbours) {
-                        neighbour.onFire = {fuel: Math.random() * 2};
-                        transform(neighbour, 'sand');
+                        for (let neighbour of neighbours) {
+                            neighbour.onFire = {fuel: Math.random()};
+                            delete neighbour.pollution;
+                            transform(neighbour, 'sand');
+                        }
                     }
                 } else {
 
@@ -95,6 +105,33 @@ export function SimulatePollution() {
             count += 1;
         }
 
-        gameState.info.averageTemperature = totalHeat / count;
+        const averageTemperature = totalHeat / count;
+        gameState.info.averageTemperature = averageTemperature;
+        if (pollutionWarningLevel === 0) {
+            if (averageTemperature > 1.25) {
+                pollutionWarningLevel = 1;
+                notifications.pollutionRising();
+            }
+        } else if (pollutionWarningLevel === 1) {
+            if (averageTemperature > 1.5) {
+                pollutionWarningLevel = 2;
+                notifications.warningPollution();
+            }
+        } else if (pollutionWarningLevel === 2) {
+            if (averageTemperature > 2) {
+                pollutionWarningLevel = 3;
+                notifications.catastrophicPollution();
+            }
+        } else if (pollutionWarningLevel === 3) {
+            if (averageTemperature > 3) {
+                pollutionWarningLevel = 4;
+                notifications.hellToCome();
+            }
+        } else if (pollutionWarningLevel === 4) {
+            if (reachedFireThreshold) {
+                pollutionWarningLevel = 5;
+                notifications.hellFire();
+            }
+        }
     }
 }

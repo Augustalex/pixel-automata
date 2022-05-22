@@ -67,10 +67,17 @@ function getTransformer(pixel, toType) {
         if (toType === 'grass') {
             return () => standardTransform(pixel, 'grass');
         }
+        if (toType === 'sand') {
+            return fromAnyToSand;
+        }
     } else if (pixel.pixelType === 'farm') {
         return () => standardTransform(pixel, toType);
     } else if (pixel.pixelType === 'zone') {
-        return fromZoneToCity;
+        if (toType === 'sand') {
+            return fromAnyToSand;
+        } else {
+            return fromZoneToCity;
+        }
     } else if (pixel.pixelType === 'city') {
         if (toType === 'zone') {
             return fromCityToZone;

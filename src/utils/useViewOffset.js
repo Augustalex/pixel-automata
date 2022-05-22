@@ -1,11 +1,13 @@
 import {ref} from "vue";
-import {TileSize, WorldWidth} from "@/utils/constants";
+import {WorldWidth} from "@/utils/constants";
 import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
+import {useTileSize} from "@/utils/useTileSize";
 
 const viewOffset = ref(0);
 
 export function useViewOffset() {
     const rotateAction = useHorizontalRotateAction();
+    const {tileSize} = useTileSize();
 
     return {
         get,
@@ -22,8 +24,8 @@ export function useViewOffset() {
         viewOffset.value = value;
     }
 
-    function worldLength() {
-        return WorldWidth * TileSize;
+    function worldLength() { // Note: Must be used by polling or through a Vue computed function
+        return WorldWidth * tileSize.value;
     }
 
     function update({delta, now}) {
