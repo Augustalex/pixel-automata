@@ -16,7 +16,7 @@ export function ZoneSystem() {
     function run({delta, pixels}) {
         for (let pixel of pixels) {
             if (pixel.pixelType === 'zone') {
-                if (Math.random() < .7) continue;
+                if (Math.random() < .3) continue;
                 transform(pixel, pixel.zoneType);
 
                 if(!hasMadeFirstCity) {

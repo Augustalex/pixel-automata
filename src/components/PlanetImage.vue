@@ -43,10 +43,10 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div class="background-container">
-    <img alt="earth" class="background-a" src="/background_a_pixel.png" @dragstart.prevent/>
-    <div alt="mars behind sky" class="mars-1" src="/mars_pixel.png" @dragstart.prevent/>
-    <img alt="sky filter on top of mars" class="skymask" src="/skymask_pixel.png" @dragstart.prevent/>
-    <div alt="slight mars color fill in" class="mars-2" src="/mars_pixel.png" @click="$emit('click')"/>
+    <img alt="earth" class="background-a" src="background_a_pixel.png" @dragstart.prevent/>
+    <div alt="mars behind sky" class="mars-1" src="mars_pixel.png" @dragstart.prevent/>
+    <img alt="sky filter on top of mars" class="skymask" src="skymask_pixel.png" @dragstart.prevent/>
+    <div alt="slight mars color fill in" class="mars-2" src="mars_pixel.png" @click="$emit('click')"/>
   </div>
 </template>
 <style lang="scss" scoped>

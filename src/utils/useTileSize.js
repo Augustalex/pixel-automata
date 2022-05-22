@@ -38,7 +38,5 @@ function calculateTileSize() {
     const standard = 1440;
     const scale = window.innerHeight / standard;
 
-    const size = Math.round(22 * scale);
-    console.log('size', size);
-    return size;
+    return Math.round(22 * scale);
 }

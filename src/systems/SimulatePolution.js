@@ -30,7 +30,6 @@ export function SimulatePollution() {
             if (pixel.onFire) {
                 pixel.onFire.fuel -= delta;
                 if (pixel.onFire.fuel <= 0) {
-                    console.log('stop fire');
                     delete pixel.onFire;
                 } else {
                     totalHeat += 99;

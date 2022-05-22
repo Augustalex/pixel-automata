@@ -50,7 +50,7 @@ export function useDrawerState() {
                 title: 'zone-city',
                 displayTitle: 'City',
                 cooldownUntil: cooldownInfos['zone-city'] || 0,
-                cooldownTime: 10,
+                cooldownTime: 60,
             },
             builtFirstCity && {
                 title: 'dig',

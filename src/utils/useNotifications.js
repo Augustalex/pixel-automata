@@ -118,8 +118,7 @@ export function useNotifications() {
             lastPlayed.value = Date.now();
             if (notifications.value[key]) return;
 
-            console.log('notifications.value[key]', notifications.value[key], key, notifications.value);
-            globalSound.play('/notification.mp3');
+            globalSound.play('notification.mp3');
             notifications.value = {...notifications.value, [key]: Date.now()};
             listeners.value.forEach(l => l(notifications.value));
         } else {
