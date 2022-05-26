@@ -60,7 +60,7 @@ export function SimulatePollution() {
                         if (!pollution) {
                             pixel.pollution = {level: 0};
                         } else {
-                            pollution.level += delta;
+                            pollution.level += delta * 1.5;
                         }
                     } else if (pixel.pixelType === 'grass' || pixel.pixelType === 'water') {
                         if (pollution) {

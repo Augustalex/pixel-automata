@@ -84,7 +84,7 @@ export function useTileColor() {
             const pollutionLevel = pixel.pollution?.level || 0;
             return [
                 50 + variation * 1.5,
-                Math.max(15, 75 + variation * 2 - (pollutionLevel * 40)),
+                pixel.connected ? Math.max(15, 75 + variation * 2 - (pollutionLevel * 40)) : 20,
                 70 + variation * 2,
                 1
             ];
@@ -108,10 +108,10 @@ export function useTileColor() {
             ];
         }
         if (pixel.pixelType === 'city') {
-            if(!variationTurnedOn) {
-                return [332,80,77, 1];
+            if (!variationTurnedOn) {
+                return [332, 80, 77, 1];
             }
-            if(!heightMapTurnedOn) {
+            if (!heightMapTurnedOn) {
                 return [
                     CityHues[Math.round(variation)],
                     80,

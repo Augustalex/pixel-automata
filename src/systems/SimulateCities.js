@@ -62,9 +62,13 @@ export function SimulateCities() {
                     cityTilesByCityId.set(pixel.cityId, currentCities);
                 } else if (pixel.pixelType === 'farm') {
                     const roadsIds = new Set(view.getNeighbours(pixel, 12, p => 'road' === p.pixelType).map(p => p.roadId));
+
+                    pixel.connected = false;
                     for (let roadId of roadsIds) {
                         const currentCount = farmCountByRoadNetwork.get(roadId) || 0;
                         farmCountByRoadNetwork.set(roadId, currentCount + 1);
+
+                        pixel.connected = true;
                     }
                 }
             }

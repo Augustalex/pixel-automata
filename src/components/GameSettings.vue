@@ -72,15 +72,14 @@ function togglePixelVariation() {
 <template>
   <div class="iconRow">
     <div v-if="miscMenuOpen" class="miscSettings-menu">
+      <button @click="toggleRotate">AUTO-ROTATE: {{ rotateAction.autoRotate.value ? 'ON' : 'OFF' }}</button>
       <button @click="togglePollutionView">SHOW POLLUTION: {{ pollutionViewOn ? 'ON' : 'OFF' }}</button>
       <button @click="toggleHeightMap">HEIGHT MAP: {{ heightMapOn ? 'ON' : 'OFF' }}</button>
       <button @click="togglePixelVariation">TILE VARIATION: {{ pixelVariationOn ? 'ON' : 'OFF' }}</button>
     </div>
-    <button :class="['iconRow-icon' ,'iconRow-buttonOn', 'iconRow-menu', miscMenuOpen ? 'miscMenu--open' : '']" @click="miscMenuOpen = !miscMenuOpen">
-      {{miscMenuOpen ? '___' : '|||'}}
-    </button>
-    <button :class="rotateClass" @click="toggleRotate">
-      R
+    <button :class="['iconRow-icon' ,'iconRow-buttonOn', 'iconRow-menu', miscMenuOpen ? 'miscMenu--open' : '']"
+            @click="miscMenuOpen = !miscMenuOpen">
+      {{ miscMenuOpen ? '___' : '|||' }}
     </button>
     <button :class="['iconRow-icon', simulationRunning ? 'iconRow-buttonOn' : '', 'iconRow-timeToggle']"
             @click.exact="toggleSpeed" @click.shift="toggleSuperSpeed">
@@ -91,7 +90,7 @@ function togglePixelVariation() {
 <style lang="scss" scoped>
 
 button {
-  font-size: 1.5em;
+  font-size: 3em;
 }
 
 .miscSettings-menu {
