@@ -7,6 +7,7 @@ import {SimulateWaterSpread} from "@/systems/SimulateWaterSpread";
 import {SimulateFarms} from "@/systems/SimulateFarms";
 import {ZoneSystem} from "@/systems/ZoneSystem";
 import {SimulatePollution} from "@/systems/SimulatePolution";
+import {ResearchSystem} from "@/systems/ResearchSystem";
 
 const SPEEDS = {
     paused: 0, normal: 1, fast: 2, bonkers: 8
@@ -127,9 +128,18 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
 }
 
 function DefaultModules() {
-    return [// SimulateGrassGrowth(),
+    return [
+        // SimulateGrassGrowth(),
         // SimulateGlobalWarming(),
-        SimulateCities(), SimulateStreams(), SimulateHumidifiers(), SimulateWaterSpread(), SimulateFarms(), ZoneSystem(), SimulatePollution()];
+        SimulateCities(),
+        SimulateStreams(),
+        SimulateHumidifiers(),
+        SimulateWaterSpread(),
+        SimulateFarms(),
+        ZoneSystem(),
+        SimulatePollution(),
+        ResearchSystem()
+    ];
 }
 
 function SimulateGrassGrowth() {
