@@ -87,8 +87,6 @@ function generateStars() {
   right: 0;
   position: fixed;
   z-index: 0;
-  left: 0;
-  top: 0;
   pointer-events: none;
 }
 

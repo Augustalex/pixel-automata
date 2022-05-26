@@ -3,6 +3,7 @@ import PixelIcon from "@/components/pixel-icon";
 import {computed} from "vue";
 import {useGameState} from "@/gameState";
 import {useDrawerState} from "@/utils/useDrawerState";
+import TechButton from "@/components/tech-button";
 
 const gameState = useGameState();
 const drawerState = useDrawerState();
@@ -14,6 +15,7 @@ const tools = computed(() => drawerState.tools.value)
   <div class="drawer-container">
     <div class="drawer">
       <span class="drawer-title">TOOLS</span>
+      <tech-button />
       <pixel-icon
           v-for="tile in tools"
           :key="tile.title"

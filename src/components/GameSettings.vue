@@ -101,6 +101,7 @@ button {
   overflow: visible;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 
   > button {
     width: 13em;
@@ -122,7 +123,7 @@ button {
 }
 
 .iconRow {
-  position: fixed;
+  position: absolute;
   z-index: 1;
   top: 1em;
   left: 1em;

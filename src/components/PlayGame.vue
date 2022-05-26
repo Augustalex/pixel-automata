@@ -8,6 +8,7 @@ import PlanetRenderer from "@/components/PlanetRenderer";
 import InfoBar from "@/components/InfoBar";
 import GameSettings from "@/components/GameSettings";
 import {useTileSize} from "@/utils/useTileSize";
+import TechTree from "@/components/TechTree";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
@@ -111,6 +112,7 @@ const css = computed(() => ({
     <game-info class="playArea-right"/>
   </div>
   <info-bar/>
+  <tech-tree/>
 </template>
 
 <style lang="scss" scoped>
