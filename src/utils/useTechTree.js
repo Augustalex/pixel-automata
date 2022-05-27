@@ -10,7 +10,7 @@ const _terraTech = ref([
     {title: 'Humidifier III', researched: false, researchTime: 10}
 ]);
 const _urbanTech = ref([
-    {title: 'City I', researched: true, researchTime: 10},
+    {title: 'City I', researched: false, researchTime: 10},
     {
         title: 'City II',
         researched: false, researchTime: 10
@@ -18,7 +18,7 @@ const _urbanTech = ref([
     {title: 'City III', researched: false, researchTime: 10}
 ]);
 const _farmingTech = ref([
-    {title: 'Farms I', researched: true, researchTime: 10},
+    {title: 'Farms I', researched: false, researchTime: 10},
     {
         title: 'Farms II',
         researched: false, researchTime: 10

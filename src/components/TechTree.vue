@@ -7,10 +7,19 @@ const techTree = useTechTree();
 
 const visible = computed(() => techTree.visible.value);
 const terraTech = computed(() => techTree.terraTech.value);
+const urbanTech = computed(() => techTree.urbanTech.value);
+const farmingTech = computed(() => techTree.farmingTech.value);
+const anythingResearching = computed(() => {
+  return terraTech.value.some(t => t.researching) ||
+      urbanTech.value.some(t => t.researching) ||
+      farmingTech.value.some(t => t.researching);
+})
 const Branches = computed(() => techTree.Branches);
 
 function clickTech(branchName, tech) {
-  if (!tech.researched && !tech.researching) {
+  if (anythingResearching.value) return;
+
+  if (!tech.researched) {
     const branch = techTree.getBranch(branchName).value;
     const techIndex = branch.findIndex(item => item.title === tech.title);
     if (techIndex === 0) {
@@ -26,14 +35,15 @@ function clickTech(branchName, tech) {
 
 </script>
 <template>
-  <div v-if="visible" class="techTree">
+  <div v-if="visible" :class="['techTree', anythingResearching && 'techTree--researching']">
     <div class="techTree-backBackground" @click="techTree.toggle"/>
     <div class="techTree-header">
       TECH TREE
     </div>
     <div class="techTree-background">
       <div class="techTree-row techTree-environment">
-        <div v-for="tech in terraTech" :key="tech.title" :class="['tech', tech.researched && 'tech--done', tech.researching && 'tech--researching']"
+        <div v-for="tech in terraTech" :key="tech.title"
+             :class="['tech', tech.researched && 'tech--done', tech.researching && 'tech--researching',  anythingResearching && 'tech--somethingResearching']"
              @click="clickTech(Branches.Terra, tech)">
           <tech-research-bar v-if="tech.researching" :tech="tech"/>
           <span class="tech-text">
@@ -43,37 +53,23 @@ function clickTech(branchName, tech) {
         <div class="techTree-rowHeader">TERRA<span :style="{marginRight: '-.4em'}"/> TECH</div>
       </div>
       <div class="techTree-row techTree-city">
-        <div class="tech">
+        <div v-for="tech in urbanTech" :key="tech.title"
+             :class="['tech', tech.researched && 'tech--done', tech.researching && 'tech--researching', anythingResearching && 'tech--somethingResearching']"
+             @click="clickTech(Branches.Urban, tech)">
+          <tech-research-bar v-if="tech.researching" :tech="tech"/>
           <span class="tech-text">
-          Humidifier
-          </span>
-        </div>
-        <div class="tech">
-          <span class="tech-text">
-          Humidifier
-          </span>
-        </div>
-        <div class="tech">
-          <span class="tech-text">
-          Humidifier
+            {{ tech.title }}
           </span>
         </div>
         <div class="techTree-rowHeader">URBAN<span :style="{marginRight: '-.4em'}"/> TECH</div>
       </div>
       <div class="techTree-row techTree-farming">
-        <div class="tech">
+        <div v-for="tech in farmingTech" :key="tech.title"
+             :class="['tech', tech.researched && 'tech--done', tech.researching && 'tech--researching',  anythingResearching && 'tech--somethingResearching']"
+             @click="clickTech(Branches.Farming, tech)">
+          <tech-research-bar v-if="tech.researching" :tech="tech"/>
           <span class="tech-text">
-          Humidifier
-          </span>
-        </div>
-        <div class="tech">
-          <span class="tech-text">
-          Humidifier
-          </span>
-        </div>
-        <div class="tech">
-          <span class="tech-text">
-          Humidifier
+            {{ tech.title }}
           </span>
         </div>
         <div class="techTree-rowHeader"><span
@@ -161,7 +157,7 @@ function clickTech(branchName, tech) {
   position: relative;
 }
 
-.tech--done + .tech:not(.tech--researching, .tech--done), .tech:first-child {
+.tech:not(.tech--done, .tech--somethingResearching):first-child, .tech--done + .tech:not(.tech--somethingResearching):not(.tech--researching):not(.tech--done) {
   background: hsl(0, 0, 10, .5);
 
   &:hover {
