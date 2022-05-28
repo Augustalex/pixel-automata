@@ -3,11 +3,12 @@ import {ref} from "vue";
 export const Tech = {
     Grains: 'Grains',
     Mushrooms: 'Marshrooms',
-    HousingDomes: 'Housing Domes',
+    HousingPods: 'Housing Domes',
     RaiseLand: 'Raise Land',
     Dig: 'Excavate Land',
     Humidifier: 'Humidifier',
-    Pipes: 'Waste pipes'
+    Pipes: 'Waste pipes',
+    CityDomes: 'City Domes'
 }
 
 const _techTreeVisible = ref(false);
@@ -20,12 +21,12 @@ const _terraTech = ref([
     },
 ]);
 const _urbanTech = ref([
-    {title: Tech.HousingDomes, researched: true, researchTime: 5},
+    {title: Tech.HousingPods, researched: true, researchTime: 5},
     {
         title: Tech.Pipes,
         researched: false, researchTime: 10
     },
-    {title: 'City III', researched: false, researchTime: 10}
+    {title: Tech.CityDomes, researched: false, researchTime: 10}
 ]);
 const _farmingTech = ref([
     {title: Tech.Grains, researched: true, researchTime: 5},

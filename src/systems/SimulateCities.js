@@ -3,11 +3,13 @@ import {PixelDataView} from "@/utils/PixelDataView";
 import {fromGrassToCity} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 import {isFarm, isMushroomsFarm} from "@/utils/farmUtils";
+import {Tech, useTechTree} from "@/utils/useTechTree";
 
 export function SimulateCities() {
     const view = PixelDataView();
     const time = useGameClock();
     const notifications = useNotifications();
+    const techTree = useTechTree();
 
     let nextRun = 0;
     let iterationId = 'a';
@@ -56,8 +58,17 @@ export function SimulateCities() {
         }
 
         if (loopCount === 1) {
+            const cityDomesResearched = techTree.isResearched(Tech.CityDomes, techTree.Branches.Urban);
+
             for (let pixel of pixels) {
                 if (pixel.pixelType === 'city') {
+                    if (pixel.cityLevel === 0 && cityDomesResearched) {
+                        const neighbours = view.getNeighbours(pixel, 3);
+                        if (neighbours.every(n => n.pixelType === 'city')) {
+                            pixel.cityLevel = 1;
+                        }
+                    }
+
                     const currentCities = cityTilesByCityId.get(pixel.cityId) || [];
                     currentCities.push(pixel);
                     cityTilesByCityId.set(pixel.cityId, currentCities);
@@ -80,9 +91,11 @@ export function SimulateCities() {
             const toMakeGrass = [];
 
             for (const cityId of cityTilesByCityId.keys()) {
+                let farmRequirement = 0;
                 const cityTiles = cityTilesByCityId.get(cityId);
                 const roadsIds = new Set();
                 for (let cityTile of cityTiles) {
+                    farmRequirement += farmRequirementByCityLevel(cityTile);
                     roadsIds.add(...view.getNeighbours(cityTile, 12, p => 'road' === p.pixelType).map(p => p.roadId));
                 }
 
@@ -91,8 +104,6 @@ export function SimulateCities() {
                     totalFarms += (farmCountByRoadNetwork.get(roadId) || 0);
                 }
 
-                // const farmRequirement = cityTiles.reduce((acc, v) => acc + farmRequirementByCityLevel(v.cityLevel), 0);
-                const farmRequirement = cityTiles.length;
                 const farmCount = totalFarms;
 
                 if (farmCount < farmRequirement) {
@@ -165,12 +176,10 @@ export function SimulateCities() {
     }
 
     function farmRequirementByCityLevel(cityLevel) {
-        if (cityLevel <= 2) {
-            return 1;
-        } else if (cityLevel <= 5) {
+        if (cityLevel >= 1) {
             return 2;
         }
-        return 3;
+        return 1;
     }
 
 }

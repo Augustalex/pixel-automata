@@ -1,7 +1,8 @@
 import {useGameState, useGlobalGameClock} from "@/gameState";
 import {computed, ref} from "vue";
-import {FarmType, isFarm} from "@/utils/farmUtils";
+import {FarmType} from "@/utils/farmUtils";
 import {Tech, useTechTree} from "@/utils/useTechTree";
+import {useTutorial} from "@/utils/useTutorial";
 
 export const FarmHumidityThreshold = .15;
 
@@ -11,6 +12,7 @@ export function useDrawerState() {
     const gameClock = useGlobalGameClock();
     const gameState = useGameState();
     const techTree = useTechTree();
+    const tutorial = useTutorial();
 
     return {
         tools: computed(() => getTools()),
@@ -26,10 +28,10 @@ export function useDrawerState() {
     }
 
     function getTools(showAll = false) {
-        const canBuildFarm = showAll || gameState.info.humidity > FarmHumidityThreshold;
-        const canBuildCity = showAll || gameState.pixels.some(p => p.pixelType === 'farm');
+        const canBuildFarm = showAll || tutorial.canBuildFarm();
+        const canBuildCity = showAll || tutorial.canBuildCity();
         const cooldownInfos = toolsUsedInfo.value;
-        const housingResearched = techTree.isResearched(Tech.HousingDomes, techTree.Branches.Urban);
+        const housingResearched = techTree.isResearched(Tech.HousingPods, techTree.Branches.Urban);
 
         const items = [
             {
