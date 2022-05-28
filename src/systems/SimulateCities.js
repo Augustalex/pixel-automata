@@ -2,6 +2,7 @@ import {useGameClock} from "@/gameState";
 import {PixelDataView} from "@/utils/PixelDataView";
 import {fromGrassToCity} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
+import {isFarm, isMushroomsFarm} from "@/utils/farmUtils";
 
 export function SimulateCities() {
     const view = PixelDataView();
@@ -60,13 +61,14 @@ export function SimulateCities() {
                     const currentCities = cityTilesByCityId.get(pixel.cityId) || [];
                     currentCities.push(pixel);
                     cityTilesByCityId.set(pixel.cityId, currentCities);
-                } else if (pixel.pixelType === 'farm') {
+                } else if (isFarm(pixel)) {
                     const roadsIds = new Set(view.getNeighbours(pixel, 12, p => 'road' === p.pixelType).map(p => p.roadId));
 
                     pixel.connected = false;
                     for (let roadId of roadsIds) {
                         const currentCount = farmCountByRoadNetwork.get(roadId) || 0;
-                        farmCountByRoadNetwork.set(roadId, currentCount + 1);
+                        const farmResource = isMushroomsFarm(pixel) ? .5 : 1;
+                        farmCountByRoadNetwork.set(roadId, currentCount + farmResource);
 
                         pixel.connected = true;
                     }

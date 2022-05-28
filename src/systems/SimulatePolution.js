@@ -2,6 +2,7 @@ import {PixelDataView} from "@/utils/PixelDataView";
 import {useGameState} from "@/gameState";
 import {transform} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
+import {isFarm} from "@/utils/farmUtils";
 
 export const FireThreshold = 4;
 
@@ -66,7 +67,7 @@ export function SimulatePollution() {
                         if (pollution) {
                             pixel.pollution.level = Math.max(0, pollution.level - delta * .5);
                         }
-                    } else if (pixel.pixelType === 'farm') {
+                    } else if (isFarm(pixel)) {
                         if (pollution && pollution.level > 2) {
                             transform(pixel, 'sand');
                         }

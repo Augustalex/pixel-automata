@@ -1,5 +1,7 @@
 import {useGameState, useGlobalGameClock} from "@/gameState";
 import {computed, ref} from "vue";
+import {FarmType, isFarm} from "@/utils/farmUtils";
+import {Tech, useTechTree} from "@/utils/useTechTree";
 
 export const FarmHumidityThreshold = .15;
 
@@ -8,6 +10,7 @@ const toolsUsedInfo = ref({});
 export function useDrawerState() {
     const gameClock = useGlobalGameClock();
     const gameState = useGameState();
+    const techTree = useTechTree();
 
     return {
         tools: computed(() => getTools()),
@@ -23,10 +26,8 @@ export function useDrawerState() {
     }
 
     function getTools(showAll = false) {
-        const canBuildFarm = showAll || gameState.info.humidity > FarmHumidityThreshold;
-        const canBuildCity = showAll || gameState.pixels.some(p => p.pixelType === 'farm');
-        const builtFirstCity = showAll || gameState.pixels.some(p => p.pixelType === 'city' || p.pixelType === 'zone-city');
         const cooldownInfos = toolsUsedInfo.value;
+        const housingResearched = techTree.isResearched(Tech.HousingDomes, techTree.Branches.Urban);
         return [
             {
                 title: 'humidifier',
@@ -34,36 +35,48 @@ export function useDrawerState() {
                 cooldownUntil: cooldownInfos['humidifier'] || 0,
                 cooldownTime: 1.3,
             },
-            canBuildFarm && {
-                title: 'farm',
+            techTree.isResearched(Tech.Grains, techTree.Branches.Farming) && {
+                title: FarmType.Grain,
                 displayTitle: 'Farm',
-                cooldownUntil: cooldownInfos['farm'] || 0,
+                cooldownUntil: cooldownInfos[FarmType.Grain] || 0,
                 cooldownTime: .5,
             },
-            canBuildCity && {
+            techTree.isResearched(Tech.Mushrooms, techTree.Branches.Farming) && {
+                title: FarmType.Mushrooms,
+                displayTitle: 'Farm - Mushrooms',
+                cooldownUntil: cooldownInfos[FarmType.Mushrooms] || 0,
+                cooldownTime: 60,
+            },
+            housingResearched && {
                 title: 'road',
                 displayTitle: 'Road',
                 cooldownUntil: cooldownInfos['road'] || 0,
                 cooldownTime: .3,
             },
-            canBuildCity && {
+            housingResearched && {
                 title: 'zone-city',
                 displayTitle: 'City',
                 cooldownUntil: cooldownInfos['zone-city'] || 0,
                 cooldownTime: 60,
             },
-            builtFirstCity && {
+            techTree.isResearched(Tech.RaiseLand, techTree.Branches.Terra) && {
+                title: 'raise',
+                displayTitle: 'Raise',
+                cooldownUntil: cooldownInfos['raise'] || 0,
+                cooldownTime: .1,
+            },
+            techTree.isResearched(Tech.Dig, techTree.Branches.Terra) && {
                 title: 'dig',
                 displayTitle: 'Dig',
                 cooldownUntil: cooldownInfos['dig'] || 0,
                 cooldownTime: .1,
             },
-            builtFirstCity && {
-                title: 'raise',
-                displayTitle: 'Raise',
-                cooldownUntil: cooldownInfos['raise'] || 0,
-                cooldownTime: .1,
-            }
+            {
+                title: 'pipe',
+                displayTitle: 'Pipes',
+                cooldownUntil: cooldownInfos['pipe'] || 0,
+                cooldownTime: 1.3,
+            },
         ].filter(i => !!i);
     }
 }

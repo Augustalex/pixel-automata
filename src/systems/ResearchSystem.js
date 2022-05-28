@@ -1,6 +1,3 @@
-import {useGameClock} from "@/gameState";
-import {PixelDataView} from "@/utils/PixelDataView";
-import {fromCityToGrass, fromGrassToCity, transform} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 import {useTechTree} from "@/utils/useTechTree";
 
@@ -31,8 +28,6 @@ export function ResearchSystem() {
                         tech.researching = false;
                         delete tech.researchProgress;
                     }
-
-                    console.log(tech);
                 }
                 return tech;
             });

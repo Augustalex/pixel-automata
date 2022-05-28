@@ -5,7 +5,6 @@ const props = defineProps({tech: Object});
 
 const progress = computed(() => {
   const tech = props.tech;
-  console.log('NEW PROGRESS', tech.researchProgress);
   return tech.researchProgress / tech.researchTime;
 });
 
@@ -13,7 +12,6 @@ const styles = computed(() => {
   const progressValue = progress.value;
   const heightScale = progressValue * 100;
   const yOffset = (50 - (heightScale / 2));
-  console.log(yOffset, heightScale);
 
   return {
     transform: `translate(0, ${yOffset}%) scale(100%, ${heightScale}%)`
@@ -22,8 +20,8 @@ const styles = computed(() => {
 
 </script>
 <template>
-  <div class="tech-researchBar"
-       :style="styles"/>
+  <div :style="styles"
+       class="tech-researchBar"/>
 </template>
 <style lang="scss" scoped>
 .tech-researchBar {

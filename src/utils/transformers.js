@@ -1,3 +1,5 @@
+import {FarmType, isFarm, isFarmType} from "@/utils/farmUtils";
+
 export {
     fromGrassToCity, fromGrassToDeadGrass, fromCityToGrass, fromGrassToHumidifier, getTransformer, transform
 }
@@ -15,18 +17,21 @@ function transform(pixel, toType) {
 
 function getTransformer(pixel, toType) {
     if (toType === 'water') {
-        return () => standardTransform(pixel, toType);
+        return fromAnyToAny(toType);
     }
 
     if (pixel.pixelType === 'grass') {
+        if (isFarmType(toType)) {
+            if (toType === FarmType.Mushrooms) {
+                return fromAnyToMushrooms;
+            }
+            return fromAnyToAny(toType);
+        }
         if (toType === 'water') {
             return fromGrassToWater;
         }
         if (toType === 'city') {
             return fromGrassToCity;
-        }
-        if (toType === 'farm') {
-            return fromGrassToFarm;
         }
         if (toType === 'humidifier') {
             return fromGrassToHumidifier;
@@ -70,7 +75,7 @@ function getTransformer(pixel, toType) {
         if (toType === 'sand') {
             return fromAnyToSand;
         }
-    } else if (pixel.pixelType === 'farm') {
+    } else if (isFarm(pixel)) {
         return () => standardTransform(pixel, toType);
     } else if (pixel.pixelType === 'zone') {
         if (toType === 'sand') {
@@ -129,13 +134,6 @@ function fromZoneToCity(pixel) {
     pixel.cityLevel = 0;
 }
 
-function fromGrassToFarm(pixel) {
-    pixel.pixelType = 'farm';
-    pixel.water = 0;
-    pixel.age = undefined;
-    pixel.variation = Math.round(Math.random() * 10);
-}
-
 function fromGrassToHumidifier(pixel) {
     pixel.age = undefined;
 
@@ -151,6 +149,17 @@ function toGrass(pixel) {
 
 function standardTransform(pixel, toType) {
     pixel.pixelType = toType;
+}
+
+function fromAnyToAny(toType) {
+    return (pixel) => {
+        pixel.pixelType = toType;
+    }
+}
+
+function fromAnyToMushrooms(pixel) {
+    pixel.pixelType = FarmType.Mushrooms;
+    pixel.life = 5;
 }
 
 function fromGrassToWater(pixel) {

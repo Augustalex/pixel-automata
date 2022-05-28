@@ -1,6 +1,7 @@
 import {iconColor} from "@/utils/iconColor";
 import {useGameState} from "@/gameState";
 import {useViewFilter} from "@/utils/useViewFilter";
+import {isFarm, isMushroomsFarm} from "@/utils/farmUtils";
 
 const CityHues = [
     291,
@@ -80,10 +81,10 @@ export function useTileColor() {
             applyVariation(100, .5, variation),
             1
         ];
-        if (pixel.pixelType === 'farm') {
+        if (isFarm(pixel)) {
             const pollutionLevel = pixel.pollution?.level || 0;
             return [
-                50 + variation * 1.5,
+                (isMushroomsFarm(pixel) ? 120 : 50) + variation * 1.5,
                 pixel.connected ? Math.max(15, 75 + variation * 2 - (pollutionLevel * 40)) : 20,
                 70 + variation * 2,
                 1

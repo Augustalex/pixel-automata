@@ -1,3 +1,5 @@
+import {FarmType} from "@/utils/farmUtils";
+
 export function iconColor(tileInfo) {
     if (tileInfo.title === 'grass') return [
         120,
@@ -5,8 +7,14 @@ export function iconColor(tileInfo) {
         76,
         1
     ];
-    if (tileInfo.title === 'farm') return [
+    if (tileInfo.title === FarmType.Grain) return [
         50,
+        85,
+        55,
+        1
+    ];
+    if (tileInfo.title === FarmType.Mushrooms) return [
+        120,
         85,
         55,
         1

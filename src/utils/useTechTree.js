@@ -1,16 +1,25 @@
 import {ref} from "vue";
 
+export const Tech = {
+    Grains: 'Grains',
+    Mushrooms: 'Marshrooms',
+    HousingDomes: 'Housing Domes',
+    RaiseLand: 'Raise Land',
+    Dig: 'Excavate Land',
+    Humidifier: 'Humidifier',
+}
+
 const _techTreeVisible = ref(false);
 const _terraTech = ref([
-    {title: 'Humidifier I', researched: true, researchTime: 10},
+    {title: Tech.Humidifier, researched: true, researchTime: 5},
+    {title: Tech.RaiseLand, researched: false, researchTime: 5},
     {
-        title: 'Humidifier II',
-        researched: false, researchTime: 10
+        title: Tech.Dig,
+        researched: false, researchTime: 5
     },
-    {title: 'Humidifier III', researched: false, researchTime: 10}
 ]);
 const _urbanTech = ref([
-    {title: 'City I', researched: false, researchTime: 10},
+    {title: Tech.HousingDomes, researched: false, researchTime: 5},
     {
         title: 'City II',
         researched: false, researchTime: 10
@@ -18,9 +27,9 @@ const _urbanTech = ref([
     {title: 'City III', researched: false, researchTime: 10}
 ]);
 const _farmingTech = ref([
-    {title: 'Farms I', researched: false, researchTime: 10},
+    {title: Tech.Grains, researched: false, researchTime: 5},
     {
-        title: 'Farms II',
+        title: Tech.Mushrooms,
         researched: false, researchTime: 10
     },
     {title: 'Farms III', researched: false, researchTime: 10}
@@ -44,8 +53,13 @@ export function useTechTree() {
             Farming
         },
         getBranch,
-        research
+        research,
+        isResearched
     };
+
+    function isResearched(tech, branchName) {
+        return getBranch(branchName).value.find(t => t.title === tech).researched;
+    }
 
     function getBranch(branch) {
         if (branch === Terra) {
@@ -61,7 +75,6 @@ export function useTechTree() {
     }
 
     function research(branch, title) {
-        console.log('Research!', branch, title);
         const branchTech = getBranch(branch);
 
         branchTech.value = branchTech.value.map(tech => {
