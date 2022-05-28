@@ -8,6 +8,7 @@ import {SimulateFarms} from "@/systems/SimulateFarms";
 import {ZoneSystem} from "@/systems/ZoneSystem";
 import {SimulatePollution} from "@/systems/SimulatePolution";
 import {ResearchSystem} from "@/systems/ResearchSystem";
+import {PipeSystem} from "@/systems/PipeSystem";
 
 const SPEEDS = {
     paused: 0, normal: 1, fast: 2, bonkers: 8
@@ -138,7 +139,8 @@ function DefaultModules() {
         SimulateFarms(),
         ZoneSystem(),
         SimulatePollution(),
-        ResearchSystem()
+        ResearchSystem(),
+        PipeSystem()
     ];
 }
 

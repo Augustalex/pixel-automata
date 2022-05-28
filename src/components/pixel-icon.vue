@@ -22,7 +22,11 @@ const css = computed(() => {
 });
 
 function onClick() {
-  cursor.setHoldingItem(props.tile.title);
+  if (cursor.holdingItem.value === props.tile.title) {
+    cursor.setHoldingItem('');
+  } else {
+    cursor.setHoldingItem(props.tile.title);
+  }
 }
 
 </script>

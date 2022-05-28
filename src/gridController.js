@@ -1,5 +1,5 @@
 import {useCursor} from "@/useCursor";
-import {getTransformer, transform} from "@/utils/transformers";
+import {getTransformer, LayerItems, transform} from "@/utils/transformers";
 import {useGameState, useGlobalGameClock} from "@/gameState";
 import {PixelDataView} from "@/utils/PixelDataView";
 import {useDrawerState} from "@/utils/useDrawerState";
@@ -46,7 +46,12 @@ export function useGridController() {
         const cooldown = Math.max(0, Math.min(1, (tileDrawerInfo.cooldownUntil - now) / tileDrawerInfo.cooldownTime));
         if (cooldown > 0) return;
 
-        if (item === 'raise') {
+        if (item === 'pipe') {
+            tile.layer1 = {
+                item: LayerItems.Pipe,
+                pollutionLevel: 0
+            };
+        } else if (item === 'raise') {
             tile.height = Math.min(10, tile.height + 1);
 
             const waterLevel = Math.round(gameState.info.humidity * 10) - 1;

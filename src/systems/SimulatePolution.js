@@ -45,6 +45,7 @@ export function SimulatePollution() {
                         delete pixel.pollution;
                         totalHeat += 99;
 
+                        delete pixel.layer1;
                         transform(pixel, 'sand');
 
                         const neighbours = view.getNeighbours(pixel, 5, p => p.pixelType !== 'sand' && !p.onFire && Math.random() < .8);
@@ -52,11 +53,11 @@ export function SimulatePollution() {
                         for (let neighbour of neighbours) {
                             neighbour.onFire = {fuel: Math.random()};
                             delete neighbour.pollution;
+                            delete neighbour.layer1;
                             transform(neighbour, 'sand');
                         }
                     }
                 } else {
-
                     if (pixel.pixelType === 'city') {
                         if (!pollution) {
                             pixel.pollution = {level: 0};

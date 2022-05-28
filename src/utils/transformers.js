@@ -1,5 +1,9 @@
 import {FarmType, isFarm, isFarmType} from "@/utils/farmUtils";
 
+export const LayerItems = {
+    Pipe: 0
+}
+
 export {
     fromGrassToCity, fromGrassToDeadGrass, fromCityToGrass, fromGrassToHumidifier, getTransformer, transform
 }

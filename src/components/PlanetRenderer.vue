@@ -12,6 +12,7 @@ import {useViewFilter} from "@/utils/useViewFilter";
 import {useTileColor} from "@/utils/tileColor";
 import {useTileSize} from "@/utils/useTileSize";
 import {useCanvas} from "@/utils/useCanvas";
+import {LayerItems} from "@/utils/transformers";
 
 const gameState = useGameState();
 
@@ -59,6 +60,7 @@ onMounted(() => {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     const showPollution = viewFilter.pollutionView.value;
+    const showPipes = cursor.holdingItem.value === 'pipe' || viewFilter.pipeView.value;
 
     for (const pixel of gameState.pixels) {
       const {x, y} = pixel.position;
@@ -73,9 +75,21 @@ onMounted(() => {
 
       if (showPollution && pixel.pollution) {
         context.fillStyle = `rgba(0,0,0, ${.15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / 2.5) * .8})`;
-        context.save();
         context.fillRect(px, py, tileSize.value, tileSize.value);
-        context.restore();
+      }
+
+      if (pixel.layer1) {
+        if (pixel.layer1.item === LayerItems.Pipe) {
+          context.fillStyle = showPipes ? `rgba(249,168,56, .65)` : `rgba(249,168,56, .12)`;
+          context.fillRect(px, py, tileSize.value, tileSize.value);
+        }
+
+        const pollutionLevel = pixel.layer1.pollutionLevel;
+        if (pollutionLevel !== undefined && pollutionLevel > 0) {
+          if(pixel.pixelType === 'water') console.log('water', pollutionLevel);
+          context.fillStyle = `rgba(20, 102, 20, ${.15 + .6 *(pollutionLevel / 10) + .25 * Math.round(pollutionLevel / 100)})`;
+          context.fillRect(px, py, tileSize.value, tileSize.value);
+        }
       }
     }
 

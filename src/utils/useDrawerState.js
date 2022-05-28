@@ -26,57 +26,80 @@ export function useDrawerState() {
     }
 
     function getTools(showAll = false) {
+        const canBuildFarm = showAll || gameState.info.humidity > FarmHumidityThreshold;
+        const canBuildCity = showAll || gameState.pixels.some(p => p.pixelType === 'farm');
         const cooldownInfos = toolsUsedInfo.value;
         const housingResearched = techTree.isResearched(Tech.HousingDomes, techTree.Branches.Urban);
-        return [
+
+        const items = [
             {
                 title: 'humidifier',
                 displayTitle: 'Humidifier',
                 cooldownUntil: cooldownInfos['humidifier'] || 0,
                 cooldownTime: 1.3,
-            },
-            techTree.isResearched(Tech.Grains, techTree.Branches.Farming) && {
-                title: FarmType.Grain,
-                displayTitle: 'Farm',
-                cooldownUntil: cooldownInfos[FarmType.Grain] || 0,
-                cooldownTime: .5,
-            },
-            techTree.isResearched(Tech.Mushrooms, techTree.Branches.Farming) && {
-                title: FarmType.Mushrooms,
-                displayTitle: 'Farm - Mushrooms',
-                cooldownUntil: cooldownInfos[FarmType.Mushrooms] || 0,
-                cooldownTime: 60,
-            },
-            housingResearched && {
-                title: 'road',
-                displayTitle: 'Road',
-                cooldownUntil: cooldownInfos['road'] || 0,
-                cooldownTime: .3,
-            },
-            housingResearched && {
-                title: 'zone-city',
-                displayTitle: 'City',
-                cooldownUntil: cooldownInfos['zone-city'] || 0,
-                cooldownTime: 60,
-            },
-            techTree.isResearched(Tech.RaiseLand, techTree.Branches.Terra) && {
+            }
+        ];
+
+        if (techTree.isResearched(Tech.RaiseLand, techTree.Branches.Terra))
+            items.push({
                 title: 'raise',
                 displayTitle: 'Raise',
                 cooldownUntil: cooldownInfos['raise'] || 0,
                 cooldownTime: .1,
-            },
-            techTree.isResearched(Tech.Dig, techTree.Branches.Terra) && {
+            });
+        if (techTree.isResearched(Tech.Dig, techTree.Branches.Terra))
+            items.push({
                 title: 'dig',
                 displayTitle: 'Dig',
                 cooldownUntil: cooldownInfos['dig'] || 0,
                 cooldownTime: .1,
-            },
-            {
+            });
+
+        if (techTree.isResearched(Tech.Pipes, techTree.Branches.Urban))
+            items.push({
                 title: 'pipe',
                 displayTitle: 'Pipes',
                 cooldownUntil: cooldownInfos['pipe'] || 0,
                 cooldownTime: 1.3,
-            },
-        ].filter(i => !!i);
+            });
+
+        if (canBuildFarm) {
+            if (techTree.isResearched(Tech.Grains, techTree.Branches.Farming))
+                items.push({
+                    title: FarmType.Grain,
+                    displayTitle: 'Farm',
+                    cooldownUntil: cooldownInfos[FarmType.Grain] || 0,
+                    cooldownTime: .5,
+                })
+            if (techTree.isResearched(Tech.Mushrooms, techTree.Branches.Farming))
+                items.push(
+                    {
+                        title: FarmType.Mushrooms,
+                        displayTitle: 'Farm - Mushrooms',
+                        cooldownUntil: cooldownInfos[FarmType.Mushrooms] || 0,
+                        cooldownTime: 60,
+                    }
+                )
+        }
+        if (canBuildCity) {
+            if (housingResearched) {
+                items.push(
+                    {
+                        title: 'road',
+                        displayTitle: 'Road',
+                        cooldownUntil: cooldownInfos['road'] || 0,
+                        cooldownTime: .3,
+                    },
+                    {
+                        title: 'zone-city',
+                        displayTitle: 'City',
+                        cooldownUntil: cooldownInfos['zone-city'] || 0,
+                        cooldownTime: 60,
+                    }
+                );
+            }
+        }
+
+        return items.filter(i => !!i);
     }
 }

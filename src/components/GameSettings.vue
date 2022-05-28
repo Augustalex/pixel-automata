@@ -30,6 +30,7 @@ const rotateClass = computed(() => {
 const pollutionViewOn = computed(() => viewFilter.pollutionView.value);
 const heightMapOn = computed(() => viewFilter.heightMap.value);
 const pixelVariationOn = computed(() => viewFilter.pixelVariation.value);
+const pipeViewOn = computed(() => viewFilter.pipeView.value);
 
 function toggleRotate() {
   rotateAction.toggleAutoRotate();
@@ -68,12 +69,17 @@ function togglePixelVariation() {
   viewFilter.pixelVariation.value = !viewFilter.pixelVariation.value;
 }
 
+function togglePipeView() {
+  viewFilter.pipeView.value = !viewFilter.pipeView.value;
+}
+
 </script>
 <template>
   <div class="iconRow">
     <div v-if="miscMenuOpen" class="miscSettings-menu">
       <button @click="toggleRotate">AUTO-ROTATE: {{ rotateAction.autoRotate.value ? 'ON' : 'OFF' }}</button>
       <button @click="togglePollutionView">SHOW POLLUTION: {{ pollutionViewOn ? 'ON' : 'OFF' }}</button>
+      <button @click="togglePipeView">SHOW PIPES: {{ pipeViewOn ? 'ON' : 'OFF' }}</button>
       <button @click="toggleHeightMap">HEIGHT MAP: {{ heightMapOn ? 'ON' : 'OFF' }}</button>
       <button @click="togglePixelVariation">TILE VARIATION: {{ pixelVariationOn ? 'ON' : 'OFF' }}</button>
     </div>

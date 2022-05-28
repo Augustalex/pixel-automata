@@ -6,8 +6,8 @@ import {onBeforeUnmount, onMounted, ref} from "vue";
 const layers = ref([{
   stars: generateStars(),
   style: {
-    left: Math.round(Math.random() * 100),
-    top: Math.round(Math.random() * 100)
+    left: 0,
+    top: 0
   },
   direction: 1,
 }, {

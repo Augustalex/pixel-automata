@@ -19,6 +19,12 @@ export function iconColor(tileInfo) {
         55,
         1
     ];
+    if(tileInfo.title === 'pipe') return [
+        35,
+        70,
+        50,
+        1
+    ];
     if (tileInfo.title === 'zone-city') return [
         350,
         0,
