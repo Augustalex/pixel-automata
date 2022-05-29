@@ -1,6 +1,6 @@
 import {useGameClock} from "@/gameState";
 import {PixelDataView} from "@/utils/PixelDataView";
-import {fromGrassToCity} from "@/utils/transformers";
+import {fromGrassToCity, LayerItems} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 import {isFarm, isMushroomsFarm} from "@/utils/farmUtils";
 import {Tech, useTechTree} from "@/utils/useTechTree";
@@ -46,14 +46,15 @@ export function SimulateCities() {
             let nextRoadId = 1;
 
             for (let pixel of pixels) {
-                if (pixel.pixelType !== 'road') continue;
-                if (pixel.roadId) {
-                    if (pixel.roadId.startsWith(iterationId)) {
-                        continue; // Already been assigned a road ID during this run
+                if (isRoad(pixel)) {
+                    if (pixel.roadId) {
+                        if (pixel.roadId.startsWith(iterationId)) {
+                            continue; // Already been assigned a road ID during this run
+                        }
                     }
-                }
 
-                assignIdsToRoadNetwork(pixel, `${iterationId}${nextRoadId++}`);
+                    assignIdsToRoadNetwork(pixel, `${iterationId}${nextRoadId++}`);
+                }
             }
         }
 
@@ -73,7 +74,7 @@ export function SimulateCities() {
                     currentCities.push(pixel);
                     cityTilesByCityId.set(pixel.cityId, currentCities);
                 } else if (isFarm(pixel)) {
-                    const roadsIds = new Set(view.getNeighbours(pixel, 12, p => 'road' === p.pixelType).map(p => p.roadId));
+                    const roadsIds = new Set(view.getNeighbours(pixel, 12, isRoad).map(p => p.roadId));
 
                     pixel.connected = false;
                     for (let roadId of roadsIds) {
@@ -96,7 +97,7 @@ export function SimulateCities() {
                 const roadsIds = new Set();
                 for (let cityTile of cityTiles) {
                     farmRequirement += farmRequirementByCityLevel(cityTile);
-                    roadsIds.add(...view.getNeighbours(cityTile, 12, p => 'road' === p.pixelType).map(p => p.roadId));
+                    roadsIds.add(...view.getNeighbours(cityTile, 12, isRoad).map(p => p.roadId));
                 }
 
                 let totalFarms = 0;
@@ -162,7 +163,7 @@ export function SimulateCities() {
                 road.roadId = roadId;
             }
 
-            const nearbyRoads = view.getNeighbours(road, 5, p => p.pixelType === 'road');
+            const nearbyRoads = view.getNeighbours(road, 5, isRoad);
             for (let nextRoad of nearbyRoads) {
                 if (nextRoad.roadId && nextRoad.roadId.startsWith(iterationId)) {
                     continue;
@@ -192,4 +193,8 @@ function shuffleArray(array) {
         array[i] = array[j];
         array[j] = temp;
     }
+}
+
+function isRoad(pixel) {
+    return pixel.pixelType === 'road' || (pixel.layer2 && pixel.layer2.item === LayerItems.Tunnel);
 }

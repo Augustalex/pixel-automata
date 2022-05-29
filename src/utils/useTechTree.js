@@ -8,16 +8,17 @@ export const Tech = {
     Dig: 'Excavate Land',
     Humidifier: 'Humidifier',
     Pipes: 'Waste pipes',
-    CityDomes: 'City Domes'
+    CityDomes: 'City Domes',
+    UndergroundHighway: 'Underground Highways'
 }
 
 const _techTreeVisible = ref(false);
 const _terraTech = ref([
     {title: Tech.Humidifier, researched: true, researchTime: 5},
-    {title: Tech.RaiseLand, researched: false, researchTime: 5},
+    {title: Tech.RaiseLand, researched: false, researchTime: 10},
     {
         title: Tech.Dig,
-        researched: false, researchTime: 5
+        researched: false, researchTime: 20
     },
 ]);
 const _urbanTech = ref([
@@ -26,15 +27,15 @@ const _urbanTech = ref([
         title: Tech.Pipes,
         researched: false, researchTime: 10
     },
-    {title: Tech.CityDomes, researched: false, researchTime: 10}
+    {title: Tech.CityDomes, researched: false, researchTime: 20},
+    {title: Tech.UndergroundHighway, researched: false, researchTime: 30}
 ]);
 const _farmingTech = ref([
     {title: Tech.Grains, researched: true, researchTime: 5},
     {
         title: Tech.Mushrooms,
-        researched: false, researchTime: 10
+        researched: false, researchTime: 20
     },
-    {title: 'Farms III', researched: false, researchTime: 10}
 ]);
 const Terra = 'Terra';
 const Urban = 'Urban';

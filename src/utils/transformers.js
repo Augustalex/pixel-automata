@@ -1,7 +1,8 @@
 import {FarmType, isFarm, isFarmType} from "@/utils/farmUtils";
 
 export const LayerItems = {
-    Pipe: 0
+    Pipe: 0,
+    Tunnel: 1
 }
 
 export {

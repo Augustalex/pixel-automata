@@ -87,16 +87,27 @@ export function useDrawerState() {
             if (housingResearched) {
                 items.push(
                     {
-                        title: 'road',
-                        displayTitle: 'Road',
-                        cooldownUntil: cooldownInfos['road'] || 0,
-                        cooldownTime: .3,
-                    },
-                    {
                         title: 'zone-city',
                         displayTitle: 'City',
                         cooldownUntil: cooldownInfos['zone-city'] || 0,
                         cooldownTime: 60,
+                    },
+                    {
+                        title: 'road',
+                        displayTitle: 'Road',
+                        cooldownUntil: cooldownInfos['road'] || 0,
+                        cooldownTime: .3,
+                    }
+                );
+            }
+
+            if (techTree.isResearched(Tech.UndergroundHighway, techTree.Branches.Urban)) {
+                items.push(
+                    {
+                        title: 'tunnel',
+                        displayTitle: 'Tunnel',
+                        cooldownUntil: cooldownInfos['tunnel'] || 0,
+                        cooldownTime: 1,
                     }
                 );
             }

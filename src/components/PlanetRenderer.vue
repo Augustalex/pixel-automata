@@ -61,6 +61,7 @@ onMounted(() => {
 
     const showPollution = viewFilter.pollutionView.value;
     const showPipes = cursor.holdingItem.value === 'pipe' || viewFilter.pipeView.value;
+    const showTunnels = cursor.holdingItem.value === 'tunnel';
 
     for (const pixel of gameState.pixels) {
       const {x, y} = pixel.position;
@@ -78,6 +79,12 @@ onMounted(() => {
         context.fillRect(px, py, tileSize.value, tileSize.value);
       }
 
+      if(pixel.layer2) {
+        if(pixel.layer2.item === LayerItems.Tunnel) {
+          context.fillStyle = showTunnels ? `rgba(17,17,27,0.65)` : `rgba(17,17,27,0.12)`;
+          context.fillRect(px, py, tileSize.value, tileSize.value);
+        }
+      }
       if (pixel.layer1) {
         if (pixel.layer1.item === LayerItems.Pipe) {
           context.fillStyle = showPipes ? `rgba(249,168,56, .65)` : `rgba(249,168,56, .12)`;
@@ -86,7 +93,6 @@ onMounted(() => {
 
         const pollutionLevel = pixel.layer1.pollutionLevel;
         if (pollutionLevel !== undefined && pollutionLevel > 0) {
-          if(pixel.pixelType === 'water') console.log('water', pollutionLevel);
           context.fillStyle = `rgba(20, 102, 20, ${.15 + .6 *(pollutionLevel / 10) + .25 * Math.round(pollutionLevel / 100)})`;
           context.fillRect(px, py, tileSize.value, tileSize.value);
         }

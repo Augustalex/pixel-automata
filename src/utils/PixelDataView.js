@@ -19,7 +19,7 @@ export function PixelDataView() {
         getNeighboursCircular,
     }
 
-    function getNeighbours(pixel, radius, checkFn) {
+    function getNeighbours(pixel, radius, checkFn = () => true) {
         return _getNeighbours(pixel.position.x, pixel.position.y, radius)
             .map(key => pixelMap.get(key))
             .filter(p => p && p !== pixel && checkFn(p));

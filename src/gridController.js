@@ -51,6 +51,10 @@ export function useGridController() {
                 item: LayerItems.Pipe,
                 pollutionLevel: 0
             };
+        } else if (item === 'tunnel') {
+            tile.layer2 = {
+                item: LayerItems.Tunnel
+            };
         } else if (item === 'raise') {
             tile.height = Math.min(10, tile.height + 1);
 
