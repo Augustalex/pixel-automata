@@ -1,6 +1,4 @@
-import {useGameClock} from "@/gameState";
-import {PixelDataView} from "@/utils/PixelDataView";
-import {fromCityToGrass, fromGrassToCity, transform} from "@/utils/transformers";
+import {transform} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 
 export function ZoneSystem() {
@@ -19,7 +17,7 @@ export function ZoneSystem() {
                 if (Math.random() < .3) continue;
                 transform(pixel, pixel.zoneType);
 
-                if(!hasMadeFirstCity) {
+                if (!hasMadeFirstCity) {
                     hasMadeFirstCity = true;
                     notifications.settlement();
                 }

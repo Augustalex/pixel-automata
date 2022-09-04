@@ -22,7 +22,7 @@ export function ResearchSystem() {
         for (let branch of branches) {
             branch.value = branch.value.map(tech => {
                 if (tech.researching) {
-                    tech.researchProgress += delta;
+                    tech.researchProgress += delta * 1000;
                     if (tech.researchProgress > tech.researchTime) {
                         tech.researched = true;
                         tech.researching = false;

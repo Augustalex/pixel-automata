@@ -2,9 +2,14 @@ import {onMounted, ref} from "vue";
 import {useTileSize} from "@/utils/useTileSize";
 import {WorldHeight} from "@/utils/constants";
 
+const _canvas = ref(null);
+
+export function useCanvasRef() {
+    return _canvas;
+}
+
 export function useCanvas() {
     const {tileSize, onChange} = useTileSize();
-    const _canvas = ref(null);
 
     onChange(updateSize);
 

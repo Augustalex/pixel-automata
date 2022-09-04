@@ -22,7 +22,11 @@ function transform(pixel, toType) {
 
 function getTransformer(pixel, toType) {
     if (toType === 'water') {
-        return fromAnyToAny(toType);
+        if (pixel.pixelType === 'grass') {
+            return fromGrassToWater;
+        } else {
+            return fromAnyToAny(toType);
+        }
     }
 
     if (pixel.pixelType === 'grass') {
@@ -170,6 +174,7 @@ function fromAnyToMushrooms(pixel) {
 function fromGrassToWater(pixel) {
     pixel.age = undefined;
     pixel.pixelType = 'water';
+    pixel.subterrain = 'grass';
 }
 
 function fromCityToZone(pixel) {

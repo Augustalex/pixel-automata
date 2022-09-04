@@ -1,7 +1,7 @@
 <script setup>
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useGameState} from "@/gameState";
-import {WorldHeight, WorldWidth} from "@/utils/constants";
+import {WATER_MAX_POLLUTION, WorldHeight, WorldWidth} from "@/utils/constants";
 import {useGridController} from "@/gridController";
 import {toCssHslColor} from "@/utils/toCssColor";
 import {useGameInputController} from "@/utils/useGameInputController";
@@ -75,7 +75,8 @@ onMounted(() => {
       context.fillRect(px, py, tileSize.value, tileSize.value);
 
       if (showPollution && pixel.pollution) {
-        context.fillStyle = `rgba(0,0,0, ${.15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / 2.5) * .8})`;
+        const maxPollution = (pixel.pixelType === 'water' ? WATER_MAX_POLLUTION : 2) * 1.25;
+        context.fillStyle = `rgba(0,0,0, ${.15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / maxPollution) * .8})`;
         context.fillRect(px, py, tileSize.value, tileSize.value);
       }
 

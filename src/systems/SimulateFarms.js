@@ -1,4 +1,4 @@
-import {PixelDataView} from "@/utils/PixelDataView";
+import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {transform} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 import {FarmType, isFarm, isGrainsFarm, isMushroomsFarm} from "@/utils/farmUtils";

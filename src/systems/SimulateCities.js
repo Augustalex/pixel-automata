@@ -1,5 +1,5 @@
 import {useGameClock} from "@/gameState";
-import {PixelDataView} from "@/utils/PixelDataView";
+import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {fromGrassToCity, LayerItems} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 import {isFarm, isMushroomsFarm} from "@/utils/farmUtils";

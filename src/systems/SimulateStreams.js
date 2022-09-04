@@ -1,4 +1,4 @@
-import {PixelDataView} from "@/utils/PixelDataView";
+import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {useGameClock} from "@/gameState";
 // Ported from Stefan Gustavson's java implementation
 // http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf

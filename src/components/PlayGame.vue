@@ -9,6 +9,7 @@ import InfoBar from "@/components/InfoBar";
 import GameSettings from "@/components/GameSettings";
 import {useTileSize} from "@/utils/useTileSize";
 import TechTree from "@/components/TechTree";
+import PixelInfo from "@/components/PixelInfo";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
@@ -106,13 +107,11 @@ const css = computed(() => ({
   <div class="playArea">
     <pixel-drawer class="playArea-left"/>
     <planet-renderer class="playArea-middle"/>
-    <!--    <div class="grid">-->
-    <!--      <pixel-tile v-for="(pixel, index) in gameState.pixels" :key="index" :pixel="pixel" :offsetX="offsetX"/>-->
-    <!--    </div>-->
     <game-info class="playArea-right"/>
   </div>
   <info-bar/>
   <tech-tree/>
+  <pixel-info />
 </template>
 
 <style lang="scss" scoped>

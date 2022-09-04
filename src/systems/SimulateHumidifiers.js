@@ -1,4 +1,4 @@
-import {PixelDataView} from "@/utils/PixelDataView";
+import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {useGameClock, useGameState} from "@/gameState";
 import {transform} from "@/utils/transformers";
 import {FarmHumidityThreshold} from "@/utils/useDrawerState";
@@ -43,6 +43,8 @@ export function SimulateHumidifiers() {
                     }
                 }
             } else if (pixel.pixelType === 'grass') {
+                humidity += 1;
+            } else if(pixel.subterrain === 'grass') {
                 humidity += 1;
             }
         }

@@ -1,18 +1,21 @@
-import {WorldWidth} from "@/utils/constants";
-import {useGameState} from "@/gameState";
+export function createPixelMapFromGrid(grid) {
+    const map = new Map();
 
-let loaded = false;
-const pixelMap = new Map();
-
-export function PixelDataView() {
-    const gameState = useGameState();
-
-    if (!loaded) {
-        for (let pixel of gameState.pixels) {
-            pixelMap.set(key(pixel), pixel);
+    for (let y = 0; y < grid.length; y++) {
+        const row = grid[y];
+        for (let x = 0; x < row.length; x++) {
+            map.set(pixelMapKey(x, y), row[x]);
         }
-        loaded = true;
     }
+
+    return map;
+}
+
+export function pixelMapKey(x, y) {
+    return `${x}:${y}`;
+}
+
+export function _PixelDataView({pixelMap, WorldWidth}) {
 
     return {
         getNeighbours,
@@ -62,9 +65,5 @@ export function PixelDataView() {
         }
 
         return n;
-    }
-
-    function key(pixel) {
-        return `${pixel.position.x}:${pixel.position.y}`;
     }
 }

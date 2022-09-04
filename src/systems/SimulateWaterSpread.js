@@ -1,4 +1,4 @@
-import {PixelDataView} from "@/utils/PixelDataView";
+import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {useGameState} from "@/gameState";
 import {getTransformer} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";

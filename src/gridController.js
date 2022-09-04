@@ -1,7 +1,7 @@
 import {useCursor} from "@/useCursor";
 import {getTransformer, LayerItems, transform} from "@/utils/transformers";
 import {useGameState, useGlobalGameClock} from "@/gameState";
-import {PixelDataView} from "@/utils/PixelDataView";
+import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {useDrawerState} from "@/utils/useDrawerState";
 
 export function useGridController() {

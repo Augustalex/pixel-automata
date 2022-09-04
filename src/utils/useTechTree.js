@@ -3,7 +3,7 @@ import {ref} from "vue";
 export const Tech = {
     Grains: 'Grains',
     Mushrooms: 'Marshrooms',
-    HousingPods: 'Housing Domes',
+    HousingPods: 'Housing Pods',
     RaiseLand: 'Raise Land',
     Dig: 'Excavate Land',
     Humidifier: 'Humidifier',
