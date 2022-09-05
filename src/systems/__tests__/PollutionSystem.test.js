@@ -33,23 +33,23 @@ it('Moves pollution across water', () => {
 
 it('Moves pollution across water for long distances', () => {
     const map = [
-        [pollutedTile(4), pollutedTile(0), pollutedTile(0), pollutedTile(0), pollutedTile(0), pollutedTile(0)],
+        [pollutedTile(200), pollutedTile(0), pollutedTile(0), pollutedTile(0), pollutedTile(0), pollutedTile(0)],
     ];
     const pixelMap = createPixelMapFromGrid(map);
     const pixelDataView = _PixelDataView({pixelMap, WorldWidth: 3});
-
     const pixels = fromGridToPixels(map);
-
+    const gameState = {info: {averageTemperature: 0}};
     const pipeSystem = SimulatePollution({
         PixelDataView: () => pixelDataView,
-        useGameState: () => ({info: {averageTemperature: 0}}),
-        useNotifications: () => jest.fn(),
+        useGameState: () => gameState,
+        useNotifications: () => ({pollutionRising: jest.fn()})
     }, {deterministic: true});
 
     pipeSystem.run({delta: 1, pixels});
     pipeSystem.run({delta: 1, pixels});
     pipeSystem.run({delta: 1, pixels});
 
+    expect(gameState.info.averageTemperature).toBeLessThan(2);
     expect(viewPollution(map)).toEqual([
         [1, 1, 1, 1, 1, 1],
     ]);

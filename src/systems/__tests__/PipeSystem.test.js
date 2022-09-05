@@ -56,16 +56,31 @@ it('Pipes distribute waste with nearby pipes', () => {
         [0, 1.2, 0],
     ]);
 })
+
 it('Pipes dont distribute more than max limit', () => {
     const {pixels, map} = setupMap([
-        [pipe(2), pipe(1), pipe(0)],
+        [pipe(10), pipe(1), pipe(0)],
     ]);
     const pipeSystem = PipeSystem({DRAW_RATE: 10});
 
     pipeSystem.run({delta: 1, pixels});
 
     matchLevels(viewPipePollution(map), [
-        [.25, 1.5, .25],
+        [1, 10, 0],
+    ]);
+})
+
+it('Pipes distribute evenly over time', () => {
+    const {pixels, map} = setupMap([
+        [pipe(10), pipe(1), pipe(0)],
+    ]);
+    const pipeSystem = PipeSystem({DRAW_RATE: 10});
+
+    pipeSystem.run({delta: 1, pixels});
+    pipeSystem.run({delta: 1, pixels});
+
+    matchLevels(viewPipePollution(map), [
+        [3, 4, 4],
     ]);
 })
 

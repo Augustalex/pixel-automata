@@ -87,7 +87,7 @@ export function PipeSystem({
                             if (tile.layer1.pollutionLevel > MAX_PIPE_CAPACITY) continue;
                             if (tile.layer1.pollutionLevel > pixel.layer1.pollutionLevel) continue;
 
-                            const toTake = Math.min(MAX_PIPE_CAPACITY * delta, pixel.layer1.pollutionLevel);
+                            const toTake = Math.min(MAX_PIPE_CAPACITY * delta, pixel.layer1.pollutionLevel * .5);
                             if (toTake > .01) {
                                 pixel.layer1.pollutionLevel -= toTake;
                                 tile.layer1.pollutionLevel += toTake;
