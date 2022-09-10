@@ -5,82 +5,44 @@ import {LayerItems} from "@/utils/transformers";
 
 jest.mock("@/utils/pixelDataView/PixelDataView", () => ({PixelDataView: jest.fn()}));
 
-it('Pipes siphen pollution from grass tiles', () => {
-    const {pixels, map} = setupMap([
-        [pollutedTile(), pollutedTile(), pollutedTile()],
-        [pollutedTile(), pipe(), pollutedTile()],
-        [pollutedTile(), pollutedTile(), pollutedTile()]
-    ]);
-    const pipeSystem = PipeSystem({DRAW_RATE: 10});
-
-    pipeSystem.run({delta: 1, pixels});
-
-    expect(viewPollution(map)).toEqual([
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
-    ]);
-})
-
-it('Pipes siphen pollution from nearby city tiles', () => {
-    const {pixels, map} = setupMap([
-        [pollutedCityTile(), pollutedCityTile(), pollutedCityTile()],
-        [pollutedCityTile(), pipe(), pollutedCityTile()],
-        [pollutedCityTile(), pollutedCityTile(), pollutedCityTile()]
-    ]);
-    const pipeSystem = PipeSystem({DRAW_RATE: 10});
-
-    pipeSystem.run({delta: 1, pixels});
-
-    expect(viewPollution(map)).toEqual([
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
-    ]);
-    matchLevels(viewPipePollution(map), [
-        [0, 0, 0],
-        [0, 8, 0],
-        [0, 0, 0]
-    ])
-})
-
 it('Pipes distribute waste with nearby pipes', () => {
     const {pixels, map} = setupMap([
-        [pipe(1.2), pipe(0), pipe(0)],
+        [pipe(0), pipe(0), pipe(0), pipeInWater()],
     ]);
-    const pipeSystem = PipeSystem({DRAW_RATE: 10});
+    const pipeSystem = PipeSystem({DRAW_RATE: 10, WATER_MAX_POLLUTION: 100});
 
     pipeSystem.run({delta: 1, pixels});
 
-    matchLevels(viewPipePollution(map), [
-        [0, 1.2, 0],
+    matchLevels(viewPipeNeed(map), [
+        [10, 10, 10, 10],
     ]);
 })
 
-it('Pipes dont distribute more than max limit', () => {
+it('Pulls pollution when has need', () => {
     const {pixels, map} = setupMap([
-        [pipe(10), pipe(1), pipe(0)],
+        [pollutedCityTile(100), pipe(0), pipe(0), pipe(0), pipeInWater()],
     ]);
-    const pipeSystem = PipeSystem({DRAW_RATE: 10});
+    const pipeSystem = PipeSystem({DRAW_RATE: 10, WATER_MAX_POLLUTION: 100});
 
     pipeSystem.run({delta: 1, pixels});
+    pipeSystem.run({delta: 1, pixels});
+    // pipeSystem.run({delta: 1, pixels});
+    // pipeSystem.run({delta: 1, pixels});
+    // pipeSystem.run({delta: 1, pixels});
+    // pipeSystem.run({delta: 1, pixels});
+    // pipeSystem.run({delta: 1, pixels});
+    // pipeSystem.run({delta: 1, pixels});
+    // pipeSystem.run({delta: 1, pixels});
+    // pipeSystem.run({delta: 1, pixels});
 
+    // matchLevels(viewPipeNeed(map), [
+    //     [10,10,10,10,10],
+    // ]);
     matchLevels(viewPipePollution(map), [
-        [1, 10, 0],
+        [0,0,10,0,10],
     ]);
-})
-
-it('Pipes distribute evenly over time', () => {
-    const {pixels, map} = setupMap([
-        [pipe(10), pipe(1), pipe(0)],
-    ]);
-    const pipeSystem = PipeSystem({DRAW_RATE: 10});
-
-    pipeSystem.run({delta: 1, pixels});
-    pipeSystem.run({delta: 1, pixels});
-
-    matchLevels(viewPipePollution(map), [
-        [3, 4, 4],
+    matchLevels(viewPollution(map), [
+        [70,0,0,0,10],
     ]);
 })
 
@@ -94,6 +56,10 @@ function viewPollution(map) {
 
 function viewPipePollution(map) {
     return map.map(row => row.map(p => p.layer1 ? p.layer1.pollutionLevel : 0));
+}
+
+function viewPipeNeed(map) {
+    return map.map(row => row.map(p => p.layer1 ? p.layer1.pollutionNeed : 0));
 }
 
 function setupMap(map) {
@@ -128,10 +94,21 @@ function pollutedTile() {
     };
 }
 
-function pollutedCityTile() {
+function pollutedCityTile(pollution) {
     return {
         pixelType: 'city',
-        pollution: {level: 1},
+        pollution: {level: pollution},
+    };
+}
+
+function pipeInWater() {
+    return {
+        pixelType: 'water',
+        pollution: {level: 0},
+        layer1: {
+            item: LayerItems.Pipe,
+            pollutionLevel: 0
+        }
     };
 }
 

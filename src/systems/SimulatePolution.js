@@ -113,7 +113,7 @@ export function SimulatePollution(
         const level = pixel.pollution.level;
 
         const maxLevel = isWater ? WATER_MAX_POLLUTION : 2;
-        if (level > maxLevel) {
+        if (level > maxLevel / 2) {
             if (deterministic || Math.random() < .3) {
                 const neighbours = view.getNeighbours(pixel, 3, p => {
                     return (!isWater || p.pixelType === 'water')
