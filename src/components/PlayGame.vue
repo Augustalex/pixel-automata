@@ -10,6 +10,7 @@ import GameSettings from "@/components/GameSettings";
 import {useTileSize} from "@/utils/useTileSize";
 import TechTree from "@/components/TechTree";
 import PixelInfo from "@/components/PixelInfo";
+import PartyChoice from "@/components/PartyChoice.vue";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
@@ -108,6 +109,7 @@ const css = computed(() => ({
     <pixel-drawer class="playArea-left"/>
     <planet-renderer class="playArea-middle"/>
     <game-info class="playArea-right"/>
+    <party-choice />
   </div>
   <info-bar/>
   <tech-tree/>
