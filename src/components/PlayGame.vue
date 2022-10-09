@@ -109,7 +109,7 @@ const css = computed(() => ({
     <pixel-drawer class="playArea-left"/>
     <planet-renderer class="playArea-middle"/>
     <game-info class="playArea-right"/>
-    <party-choice />
+<!--    <party-choice />-->
   </div>
   <info-bar/>
   <tech-tree/>

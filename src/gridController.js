@@ -42,6 +42,7 @@ export function useGridController() {
     function useItemOnTile(tile) {
         const item = cursor.holdingItem.value;
         const tileDrawerInfo = drawerState.tools.value.find(t => t.title === item);
+        if(!tileDrawerInfo) return;
         const now = gameClock.value;
         const cooldown = Math.max(0, Math.min(1, (tileDrawerInfo.cooldownUntil - now) / tileDrawerInfo.cooldownTime));
         if (cooldown > 0) return;
