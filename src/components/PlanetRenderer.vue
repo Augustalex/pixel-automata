@@ -43,9 +43,11 @@ const boxShadow = computed(() => ringColor.value + ', ' + atmosphereColor.value)
 onMounted(() => {
   const canvas = canvasRef.value;
 
-  const { renderPixel, startRender } = RedPixels({canvas});
+  const { startRender, generateVertices, renderPixels } = RedPixels({canvas});
 
   gameInput.start();
+
+  generateVertices(tileSize.value, WorldWidth, WorldHeight);
 
   let lastNow = Date.now();
   const loop = () => {
@@ -60,118 +62,110 @@ onMounted(() => {
 
     const hoveringTile = cursor.hoveringTile.value;
 
-    // const context = canvas.getContext('2d');
-    // context.clearRect(0, 0, canvas.width, canvas.height);
     startRender();
 
     const showPollution = viewFilter.pollutionView.value;
     const showPipes = cursor.holdingItem.value === 'pipe' || viewFilter.pipeView.value;
     const showTunnels = cursor.holdingItem.value === 'tunnel';
 
-    const hues = new Float32Array(5);
-    const saturates = new Float32Array(5);
-    const lightnesses = new Float32Array(5);
-    const alphas = new Float32Array(5);
+    // TODO:
+    // 1. Optimize colors array - can it be done with a fixed array instead of a linked list?
+    // 2. Make #of draw layers a system, down to the rendering engine, since currently is hard coded in both places. (it is too implicit right now)
+    // 3. profit
+
+    const colors = [];
+
     for (const pixel of gameState.pixels) {
-      const {x, y} = pixel.position;
-
-      const newX = Math.round(x * tileSize.value + viewOffsetX);
-
-      const tileSizeValue = tileSize.value;
-      const py = y * tileSizeValue;
-      const px = newX % viewOffset.worldLength() - tileSizeValue;
 
       const [h1, s1, l1, a1] = lighten(color(pixel, gameState.info), hoveringTile === pixel ? 1.4 : 1);
-      // renderPixel(px, py, tileSizeValue, h1, s1, l1, a1);
-      hues[0] = h1;
-      saturates[0] = s1;
-      lightnesses[0] = l1;
-      alphas[0] = a1;
-
-      // context.fillStyle = colorToCss(lighten(color(pixel, gameState.info), hoveringTile === pixel ? 1.4 : 1));
-      // context.fillRect(px, py, tileSizeValue, tileSizeValue);
+      colors.push(h1, s1, l1, a1);
 
       // 1
-      hues[1] = 1;
-      saturates[1] = 1;
-      lightnesses[1] = 1;
-      alphas[1] = 1;
-      if (showPollution && pixel.pollution) {
-        const maxPollution = (pixel.pixelType === 'water' ? WATER_MAX_POLLUTION : 2) * 1.25;
-        // renderPixel(px, py, tileSizeValue, 0, 0, 0, .15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / maxPollution) * .8);
-        alphas[1] = .15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / maxPollution) * .8;
+      {
+        let h = 0;
+        let s = 0;
+        let l = 0;
+        let a = 0;
 
-        // context.fillStyle = `rgba(0,0,0, ${.15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / maxPollution) * .8})`;
-        // context.fillRect(px, py, tileSizeValue, tileSizeValue);
+        if (showPollution && pixel.pollution) {
+          const maxPollution = (pixel.pixelType === 'water' ? WATER_MAX_POLLUTION : 2) * 1.25;
+          a = .15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / maxPollution) * .8;
+        }
+
+        colors.push(h,s,l,a);
       }
 
       // 2
-      hues[2] = 1;
-      saturates[2] = 1;
-      lightnesses[2] = 1;
-      alphas[2] = 1;
-      if(pixel.layer2) {
-        if(pixel.layer2.item === LayerItems.Tunnel) {
-          hues[2] = 240;
-          saturates[2] = 37;
-          lightnesses[2] = 11;
+      {
+        let h = 0;
+        let s = 0;
+        let l = 0;
+        let a = 0;
 
-          if(showTunnels) {
-            // renderPixel(px, py, tileSizeValue, 240, 37, 11, .65);
-            alphas[2] = .65;
+        if (pixel.layer2) {
+          if (pixel.layer2.item === LayerItems.Tunnel) {
+            h = 240;
+            s = 37;
+            l = 11;
+
+            if (showTunnels) {
+              a = .65;
+            } else {
+              a = .12;
+            }
           }
-          else {
-            alphas[2] = .12;
-            // renderPixel(px, py, tileSizeValue, 240, 37, 11, .12);
-          }
-          // context.fillStyle = showTunnels ? `rgba(17,17,27,0.65)` : `rgba(17,17,27,0.12)`;
-          // context.fillRect(px, py, tileSizeValue, tileSizeValue);
         }
+
+        colors.push(h,s,l,a);
       }
 
       // 3
-      hues[3] = 1;
-      saturates[3] = 1;
-      lightnesses[3] = 1;
-      alphas[3] = 1;
-      if (pixel.layer1) {
-        if (pixel.layer1.item === LayerItems.Pipe) {
-          hues[3] = 35;
-          saturates[3] = 78;
-          lightnesses[3] = 90;
+      {
+        let h = 0;
+        let s = 0;
+        let l = 0;
+        let a = 0;
 
-          if(showPipes) {
-            // renderPixel(px, py, tileSizeValue, 35, 78, 98, .65);
-            alphas[3] = .65;
+        if (pixel.layer1 && pixel.layer1.item === LayerItems.Pipe) {
+          h = 35;
+          s = 80;
+          l = 62;
+
+          if (showPipes) {
+            a = .8;
+          } else {
+            a = .12;
           }
-          else {
-            // renderPixel(px, py, tileSizeValue, 35, 78, 98, .12);
-            alphas[3] = .12;
-          }
-          // context.fillStyle = showPipes ? `rgba(249,168,56, .65)` : `rgba(249,168,56, .12)`;
-          // context.fillRect(px, py, tileSizeValue, tileSizeValue);
         }
 
-        // 4
-        hues[4] = 1;
-        saturates[4] = 1;
-        lightnesses[4] = 1;
-        alphas[4] = 1;
-        const pollutionLevel = pixel.layer1.pollutionLevel;
-        if (pollutionLevel !== undefined && pollutionLevel > 0) {
-          hues[4] = 120;
-          saturates[4] = 80;
-          lightnesses[4] = 40;
-          alphas[4] = .15 + .6 *(pollutionLevel / 10) + .25 * Math.round(pollutionLevel / 100);
-          // renderPixel(px, py, tileSizeValue, 120, 80, 40, .15 + .6 *(pollutionLevel / 10) + .25 * Math.round(pollutionLevel / 100));
-
-          // context.fillStyle = `rgba(20, 102, 20, ${.15 + .6 *(pollutionLevel / 10) + .25 * Math.round(pollutionLevel / 100)})`;
-          // context.fillRect(px, py, tileSizeValue, tileSizeValue);
-        }
+        colors.push(h,s,l,a);
       }
 
-      renderPixel(px, py, tileSizeValue, hues, saturates, lightnesses, alphas);
+      // 4
+      {
+        let h = 0;
+        let s = 0;
+        let l = 0;
+        let a = 0;
+
+        if(pixel.layer1) {
+          const pollutionLevel = pixel.layer1.pollutionLevel;
+          if (pollutionLevel !== undefined && pollutionLevel > 0) {
+            h = 120;
+            s = 80;
+            l = 40;
+            a = .15 + .6 * (pollutionLevel / 10) + .25 * Math.round(pollutionLevel / 100);
+          }
+        }
+
+        colors.push(h,s,l,a);
+      }
     }
+
+    const newX = viewOffsetX;
+    const tileSizeValue = tileSize.value;
+
+    renderPixels(colors, newX, WorldWidth, tileSizeValue);
 
     lastNow = now;
 

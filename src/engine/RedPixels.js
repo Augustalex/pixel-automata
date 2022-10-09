@@ -1,67 +1,202 @@
 "use strict";
+
 const vertexShaderSource = `#version 300 es
   in vec2 a_position;
- 
+  in vec2 a_offset;
+  in vec4 color;
+  
   uniform vec2 u_resolution;
+  uniform float screenOffset;
+  uniform float worldSize;
+  uniform float tileSize;
+  
+  out vec4 v_color;
  
   void main() {
-    // convert the position from pixels to 0.0 to 1.0
-    vec2 zeroToOne = a_position / u_resolution;
- 
+    float index = floor(float(gl_InstanceID) / 5.0);
+    float x = mod(float(index), worldSize);
+    float y = float(index) / worldSize;
+    vec2 offset = vec2(x, y);
+    
+    float offsetX = offset.x + (screenOffset / tileSize);
+    float boundedOffsetX = offsetX < 0.0 ? offsetX + worldSize : offsetX > worldSize ? offsetX - worldSize : offsetX;
+    vec2 newOffset = vec2(boundedOffsetX - 1.0, offset.y) * tileSize;
+    
+    vec2 rect = a_position * vec2(tileSize, tileSize);
+    vec2 actualPosition = rect + newOffset; 
+    
+    vec2 zeroToOne = actualPosition / u_resolution;
     // convert from 0->1 to 0->2
     vec2 zeroToTwo = zeroToOne * 2.0;
- 
     // convert from 0->2 to -1->+1 (clip space)
     vec2 clipSpace = zeroToTwo - 1.0;
     
     gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+    
+    v_color = color;
   }
 `;
 
 const fragmentShaderSource = `#version 300 es
 precision highp float;
 
-uniform float[5] hues;
-uniform float[5] saturates;
-uniform float[5] lightnesses;
-uniform float[5] alphas;
+in vec4 v_color;
 
-// we need to declare an output for the fragment shader
 out vec4 outColor;
 
 vec3 hsl2rgb( in vec3 c )
 {
     vec3 rgb = clamp( abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );
-
     return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
 }
 
-vec4 addAlpha(in vec3 rgb, in float a)
-{
-    return vec4(rgb.x, rgb.y, rgb.z, a);
-} 
-
-vec3 fade(in vec3 rgb, in float a)
-{
-    return vec3(rgb.x * a, rgb.y * a, rgb.z * a);
-}
-
 void main() {
-  vec3 finalColor = vec3(0.0,0.0,0.0);
-  for (int i = 0; i < 1; i++)
-  {
-    vec4 rgba = addAlpha( hsl2rgb( vec3( hues[i],saturates[i],lightnesses[i] ) ), alphas[i]);
-    vec3 rgb = vec3(rgba.x, rgba.y, rgba.z);
-    finalColor = rgb;
-    // float mixAlpha = 1.0 - alphas[i];
-    // finalColor = fade(finalColor, mixAlpha) + rgb;
-    // float a = finalColor.w + (1.0 - finalColor.w) * rgba.w;
-    // finalColor = vec4(1.0 / a * (finalColor.w * finalColor.x + (1.0 - finalColor.w) * rgba.w * rgba.x), 1.0 / a * (finalColor.w * finalColor.y + (1.0 - finalColor.w) * rgba.w * rgba.y), 1.0 / a * (finalColor.w * finalColor.z + (1.0 - finalColor.w) * rgba.w * rgba.z), a);
-  }
-
-  outColor = vec4(1,.5,.5,1);
+  vec3 rgb = hsl2rgb(vec3(v_color.x / 360.0, v_color.y / 100.0, v_color.z / 100.0));
+  outColor = vec4(rgb, v_color.w);
 }
 `;
+
+export function RedPixels({canvas}) {
+    const gl = canvas.getContext("webgl2", {premultipliedAlpha: false, alpha: false, antialias: false});
+    if (!gl) {
+        return;
+    }
+
+    const program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
+    gl.useProgram(program);
+
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+    gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    const screenOffsetLocation = gl.getUniformLocation(program, "screenOffset");
+    gl.uniform1f(screenOffsetLocation, 0);
+    const worldSizeLocation = gl.getUniformLocation(program, "worldSize");
+    gl.uniform1f(worldSizeLocation, 0);
+    const tileSizeLocation = gl.getUniformLocation(program, "tileSize");
+    gl.uniform1f(tileSizeLocation, 0);
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendEquation(gl.FUNC_ADD);
+
+    let entityCount = 0;
+    const colorBuffer = gl.createBuffer();
+    const colorAttributeLocation = gl.getAttribLocation(program, "color");
+
+    return {
+        generateVertices,
+        startRender,
+        renderPixels
+    };
+
+    function generateVertices(tileSize, worldWidth, worldHeight) {
+        // SETUP INSTANCED MESH
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rectangleMesh()), gl.STATIC_DRAW);
+        const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+        gl.enableVertexAttribArray(positionAttributeLocation);
+        gl.vertexAttribPointer(
+            positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+        // SETUP OFFSET
+        const offsetBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, offsetBuffer);
+        {
+            const bufferData = [];
+            let worldX = 0;
+            let worldY = 0;
+            for (let y = 0; y < worldHeight; y++) {
+                worldY = y;
+
+                for (let x = 0; x < worldWidth; x++) {
+                    worldX = x;
+
+                    // Add 1 instance for each paint layer
+                    bufferData.push(worldX, worldY);
+                    bufferData.push(worldX, worldY);
+                    bufferData.push(worldX, worldY);
+                    bufferData.push(worldX, worldY);
+                    bufferData.push(worldX, worldY);
+
+                    entityCount += 5;
+                }
+            }
+            gl.bufferData(gl.ARRAY_BUFFER,
+                new Float32Array(bufferData),
+                gl.STATIC_DRAW);
+
+            const offsetAttributeLocation = gl.getAttribLocation(program, "a_offset");
+            gl.enableVertexAttribArray(offsetAttributeLocation);
+            gl.vertexAttribPointer(offsetAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribDivisor(offsetAttributeLocation, 1);
+        }
+
+        // SETUP COLOR
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        {
+            const colorData = [];
+            let worldX = 0;
+            let worldY = 0;
+            for (let x = 0; x < worldWidth; x++) {
+                worldX = x * tileSize;
+
+                for (let y = 0; y < worldHeight; y++) {
+                    worldY = y * tileSize;
+                    const d = [Math.random() * 360,Math.random() * 100,Math.random() * 100,Math.random()];
+
+                    // Color for each paint layer
+                    colorData.push(...d);
+                    colorData.push(...d);
+                    colorData.push(...d);
+                    colorData.push(...d);
+                    colorData.push(...d);
+                }
+            }
+            gl.bufferData(gl.ARRAY_BUFFER,
+                new Float32Array(colorData),
+                gl.DYNAMIC_DRAW);
+
+            gl.enableVertexAttribArray(colorAttributeLocation);
+            gl.vertexAttribPointer(colorAttributeLocation, 4, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribDivisor(colorAttributeLocation, 1);
+        }
+    }
+
+    function startRender() {
+        // There was no need to clear anything, but maybe there is something else that needs to be done?
+    }
+
+    function renderPixels(colors, screenOffsetX, worldSize, tileSize) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.DYNAMIC_DRAW);
+        gl.uniform1f(worldSizeLocation, worldSize);
+        gl.uniform1f(tileSizeLocation, tileSize);
+        gl.uniform1f(screenOffsetLocation, screenOffsetX);
+
+        gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, entityCount);
+    }
+}
+
+function rectangleMesh() {
+    const x1 = 0;
+    const x2 = 1;
+    const y1 = 0;
+    const y2 = 1;
+
+    return [
+        x1, y1,
+        x2, y1,
+        x1, y2,
+        x1, y2,
+        x2, y1,
+        x2, y2
+    ];
+}
 
 function createShader(gl, type, source) {
     const shader = gl.createShader(type);
@@ -77,7 +212,10 @@ function createShader(gl, type, source) {
     return undefined;
 }
 
-function createProgram(gl, vertexShader, fragmentShader) {
+function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
+    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
     const program = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
@@ -90,121 +228,4 @@ function createProgram(gl, vertexShader, fragmentShader) {
     console.log(gl.getProgramInfoLog(program));  // eslint-disable-line
     gl.deleteProgram(program);
     return undefined;
-}
-
-export function RedPixels({canvas}) {
-    // Get A WebGL context
-    const gl = canvas.getContext("webgl2");
-    if (!gl) {
-        return;
-    }
-    // create GLSL shaders, upload the GLSL source, compile the shaders
-    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-    const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-
-    // Link the two shaders into a program
-    const program = createProgram(gl, vertexShader, fragmentShader);
-    const colorLocation = gl.getUniformLocation(program, "u_color");
-
-    // look up where the vertex data needs to go.
-    const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-
-    // Create a buffer and put three 2d clip space points in it
-    const positionBuffer = gl.createBuffer();
-
-    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-    const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
-
-    // Create a vertex array object (attribute state)
-    const vao = gl.createVertexArray();
-
-    // and make it the one we're currently working with
-    gl.bindVertexArray(vao);
-
-    // Turn on the attribute
-    gl.enableVertexAttribArray(positionAttributeLocation);
-
-    // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    const size = 2;          // 2 components per iteration
-    const type = gl.FLOAT;   // the data is 32bit floats
-    const normalize = false; // don't normalize the data
-    const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    const offset = 0;        // start at the beginning of the buffer
-    gl.vertexAttribPointer(
-        positionAttributeLocation, size, type, normalize, stride, offset);
-
-
-    // Tell WebGL how to convert from clip space to pixels
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    return {
-        startRender,
-        renderPixel
-    };
-
-    function startRender() {
-        // Clear the canvas
-        gl.clearColor(0, 0, 0, 0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-
-        // Tell it to use our program (pair of shaders)
-        gl.useProgram(program);
-
-        gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
-
-        // Bind the attribute/buffer set we want.
-        gl.bindVertexArray(vao);
-
-    }
-
-    function renderPixel(x, y, tileSize, hues, saturates, lightnesses, alphas) {
-        // console.log(hues, saturates, lightnesses, alphas);
-        // if(Math.random() < .001) throw new Error();
-        setRectangle(
-            gl, x, y, tileSize, tileSize);
-
-        // Set a random color. H S L
-        gl.uniform4f(colorLocation, hues, saturates, lightnesses, alphas);
-
-        const primitiveType = gl.TRIANGLES;
-        const offset = 0;
-        const count = 6;
-        gl.drawArrays(primitiveType, offset, count);
-    }
-
-    //
-    // function renderPixel(x, y, tileSize, hue, saturation, lightness, alpha) {
-    //     setRectangle(
-    //         gl, x, y, tileSize, tileSize);
-    //
-    //     // Set a random color. H S L
-    //     gl.uniform4f(colorLocation, hue / 360, saturation / 100, lightness / 100, alpha);
-    //
-    //     const primitiveType = gl.TRIANGLES;
-    //     const offset = 0;
-    //     const count = 6;
-    //     gl.drawArrays(primitiveType, offset, count);
-    // }
-}
-
-function setRectangle(gl, x, y, width, height) {
-    const x1 = x;
-    const x2 = x + width;
-    const y1 = y;
-    const y2 = y + height;
-
-    // NOTE: gl.bufferData(gl.ARRAY_BUFFER, ...) will affect
-    // whatever buffer is bound to the `ARRAY_BUFFER` bind point
-    // but so far we only have one buffer. If we had more than one
-    // buffer we'd want to bind that buffer to `ARRAY_BUFFER` first.
-
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        x1, y1,
-        x2, y1,
-        x1, y2,
-        x1, y2,
-        x2, y1,
-        x2, y2]), gl.STATIC_DRAW);
 }
