@@ -7,20 +7,23 @@ const vertexShaderSource = `#version 300 es
   uniform int layerPerTile;
   uniform vec2 u_resolution;
   uniform float screenOffset;
-  uniform float worldSize;
+  uniform int worldSize;
   uniform float tileSize;
   
   out vec4 v_color;
  
   void main() {
-    float index = floor(float(gl_InstanceID) / float(layerPerTile));
-    float x = mod(float(index), worldSize);
-    float y = float(index) / worldSize;
-    vec2 offset = vec2(x, y);
+    int index = gl_InstanceID / layerPerTile;
+    int x = index % worldSize;
+    int y = index / worldSize;
     
-    float offsetX = offset.x + (screenOffset / tileSize);
-    float boundedOffsetX = offsetX < 0.0 ? offsetX + worldSize : offsetX > worldSize ? offsetX - worldSize : offsetX;
-    vec2 newOffset = vec2(boundedOffsetX - 1.0, offset.y) * tileSize;
+    float fX = float(x);
+    float fY = float(y);
+    float fWorldSize = float(worldSize);
+    
+    float offsetX = fX + screenOffset;
+    float boundedOffsetX = offsetX < 0.0 ? offsetX + fWorldSize : offsetX > fWorldSize ? offsetX - fWorldSize : offsetX;
+    vec2 newOffset = vec2(boundedOffsetX - 1.0, fY) * tileSize;
     
     vec2 rect = a_position * vec2(tileSize, tileSize);
     vec2 actualPosition = rect + newOffset; 
@@ -75,7 +78,7 @@ export function RedPixels({canvas}) {
     const screenOffsetLocation = gl.getUniformLocation(program, "screenOffset");
     gl.uniform1f(screenOffsetLocation, 0);
     const worldSizeLocation = gl.getUniformLocation(program, "worldSize");
-    gl.uniform1f(worldSizeLocation, 0);
+    gl.uniform1i(worldSizeLocation, 0);
     const tileSizeLocation = gl.getUniformLocation(program, "tileSize");
     gl.uniform1f(tileSizeLocation, 0);
     const layerPerTileLocation = gl.getUniformLocation(program, "layerPerTile");
@@ -142,13 +145,14 @@ export function RedPixels({canvas}) {
 
     function startRender() {
         // There was no need to clear anything, but maybe there is something else that needs to be done?
+        gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     }
 
     function renderPixels(colorData, screenOffsetX, worldSize, tileSize) {
-        console.log(worldSize, tileSize);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, colorData);
-        gl.uniform1f(worldSizeLocation, worldSize);
+        gl.uniform1i(worldSizeLocation, worldSize);
         gl.uniform1f(tileSizeLocation, tileSize);
         gl.uniform1f(screenOffsetLocation, screenOffsetX);
 

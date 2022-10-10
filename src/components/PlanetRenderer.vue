@@ -55,19 +55,20 @@ onMounted(() => {
   const loop = () => {
     if (!running.value) return;
 
-    const viewOffsetX = viewOffset.get().value;
-
     const now = Date.now();
     const delta = (now - lastNow) / 1000;
+
+    // UPDATE DATA
     gameInput.update({now, delta});
     viewOffset.update({now, delta});
 
-    const hoveringTile = cursor.hoveringTile.value;
-
-    const humidity = gameState.info.humidity;
-
+    // RENDERING
     startRender();
 
+    const tileSizeValue = tileSize.value;
+    const viewOffsetX = viewOffset.get().value / tileSizeValue;
+    const hoveringTile = cursor.hoveringTile.value;
+    const humidity = gameState.info.humidity;
     const showPollution = viewFilter.pollutionView.value;
     const showPipes = cursor.holdingItem.value === 'pipe' || viewFilter.pipeView.value;
     const showTunnels = cursor.holdingItem.value === 'tunnel';
@@ -178,10 +179,7 @@ onMounted(() => {
       }
     }
 
-    const newX = viewOffsetX;
-    const tileSizeValue = tileSize.value;
-
-    renderPixels(colorData, newX, WorldWidth, tileSizeValue);
+    renderPixels(colorData, viewOffsetX, WorldWidth, tileSizeValue);
 
     lastNow = now;
 
