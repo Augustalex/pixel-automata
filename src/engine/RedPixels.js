@@ -2,9 +2,9 @@
 
 const vertexShaderSource = `#version 300 es
   in vec2 a_position;
-  in vec2 a_offset;
   in vec4 color;
   
+  uniform int layerPerTile;
   uniform vec2 u_resolution;
   uniform float screenOffset;
   uniform float worldSize;
@@ -13,7 +13,7 @@ const vertexShaderSource = `#version 300 es
   out vec4 v_color;
  
   void main() {
-    float index = floor(float(gl_InstanceID) / 5.0);
+    float index = floor(float(gl_InstanceID) / float(layerPerTile));
     float x = mod(float(index), worldSize);
     float y = float(index) / worldSize;
     vec2 offset = vec2(x, y);
@@ -78,6 +78,8 @@ export function RedPixels({canvas}) {
     gl.uniform1f(worldSizeLocation, 0);
     const tileSizeLocation = gl.getUniformLocation(program, "tileSize");
     gl.uniform1f(tileSizeLocation, 0);
+    const layerPerTileLocation = gl.getUniformLocation(program, "layerPerTile");
+    gl.uniform1i(layerPerTileLocation, 0);
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -93,7 +95,7 @@ export function RedPixels({canvas}) {
         renderPixels
     };
 
-    function generateVertices(tileSize, worldWidth, worldHeight) {
+    function generateVertices(tileSize, worldWidth, worldHeight, layerPerTile) {
         // SETUP INSTANCED MESH
         const positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -102,39 +104,6 @@ export function RedPixels({canvas}) {
         gl.enableVertexAttribArray(positionAttributeLocation);
         gl.vertexAttribPointer(
             positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-
-        // SETUP OFFSET
-        const offsetBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, offsetBuffer);
-        {
-            const bufferData = [];
-            let worldX = 0;
-            let worldY = 0;
-            for (let y = 0; y < worldHeight; y++) {
-                worldY = y;
-
-                for (let x = 0; x < worldWidth; x++) {
-                    worldX = x;
-
-                    // Add 1 instance for each paint layer
-                    bufferData.push(worldX, worldY);
-                    bufferData.push(worldX, worldY);
-                    bufferData.push(worldX, worldY);
-                    bufferData.push(worldX, worldY);
-                    bufferData.push(worldX, worldY);
-
-                    entityCount += 5;
-                }
-            }
-            gl.bufferData(gl.ARRAY_BUFFER,
-                new Float32Array(bufferData),
-                gl.STATIC_DRAW);
-
-            const offsetAttributeLocation = gl.getAttribLocation(program, "a_offset");
-            gl.enableVertexAttribArray(offsetAttributeLocation);
-            gl.vertexAttribPointer(offsetAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-            gl.vertexAttribDivisor(offsetAttributeLocation, 1);
-        }
 
         // SETUP COLOR
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
@@ -155,6 +124,8 @@ export function RedPixels({canvas}) {
                     colorData.push(...d);
                     colorData.push(...d);
                     colorData.push(...d);
+
+                    entityCount += 5;
                 }
             }
             gl.bufferData(gl.ARRAY_BUFFER,
@@ -165,15 +136,18 @@ export function RedPixels({canvas}) {
             gl.vertexAttribPointer(colorAttributeLocation, 4, gl.FLOAT, false, 0, 0);
             gl.vertexAttribDivisor(colorAttributeLocation, 1);
         }
+
+        gl.uniform1i(layerPerTileLocation, layerPerTile);
     }
 
     function startRender() {
         // There was no need to clear anything, but maybe there is something else that needs to be done?
     }
 
-    function renderPixels(colors, screenOffsetX, worldSize, tileSize) {
+    function renderPixels(colorData, screenOffsetX, worldSize, tileSize) {
+        console.log(worldSize, tileSize);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.DYNAMIC_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, colorData);
         gl.uniform1f(worldSizeLocation, worldSize);
         gl.uniform1f(tileSizeLocation, tileSize);
         gl.uniform1f(screenOffsetLocation, screenOffsetX);

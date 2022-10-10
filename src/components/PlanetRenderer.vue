@@ -42,7 +42,14 @@ onMounted(() => {
 
   gameInput.start();
 
-  generateVertices(tileSize.value, WorldWidth, WorldHeight);
+  const float32ByteSize = 4;
+  const hslaSize = float32ByteSize * 4;
+  const colorsPerPixel = 5;
+  const pixelCount = pixels.length;
+  const buffer = new ArrayBuffer(hslaSize * colorsPerPixel * pixelCount);
+  const colorData = new Float32Array(buffer);
+
+  generateVertices(tileSize.value, WorldWidth, WorldHeight, colorsPerPixel);
 
   let lastNow = Date.now();
   const loop = () => {
@@ -68,17 +75,14 @@ onMounted(() => {
     const heightMapOn = viewFilter.heightMap.value;
     const variationTurnedOn = viewFilter.pixelVariation.value;
 
-    // TODO:
-    // 1. Optimize colors array - can it be done with a fixed array instead of a linked list?
-    // 2. Make #of draw layers a system, down to the rendering engine, since currently is hard coded in both places. (it is too implicit right now)
-    // 3. profit
-
-    const colors = [];
-
+    let index = 0;
     for (const pixel of pixels) {
 
       const [h1, s1, l1, a1] = lighten(color(pixel, humidity, variationTurnedOn, heightMapOn), hoveringTile === pixel ? 1.4 : 1);
-      colors.push(h1, s1, l1, a1);
+      colorData[index++] = h1;
+      colorData[index++] = s1;
+      colorData[index++] = l1;
+      colorData[index++] = a1;
 
       // 1
       {
@@ -92,7 +96,10 @@ onMounted(() => {
           a = .15 + easeInCirc(Math.min(2.5, pixel.pollution.level) / maxPollution) * .8;
         }
 
-        colors.push(h,s,l,a);
+        colorData[index++] = h;
+        colorData[index++] = s;
+        colorData[index++] = l;
+        colorData[index++] = a;
       }
 
       // 2
@@ -116,7 +123,10 @@ onMounted(() => {
           }
         }
 
-        colors.push(h,s,l,a);
+        colorData[index++] = h;
+        colorData[index++] = s;
+        colorData[index++] = l;
+        colorData[index++] = a;
       }
 
       // 3
@@ -138,7 +148,10 @@ onMounted(() => {
           }
         }
 
-        colors.push(h,s,l,a);
+        colorData[index++] = h;
+        colorData[index++] = s;
+        colorData[index++] = l;
+        colorData[index++] = a;
       }
 
       // 4
@@ -158,14 +171,17 @@ onMounted(() => {
           }
         }
 
-        colors.push(h,s,l,a);
+        colorData[index++] = h;
+        colorData[index++] = s;
+        colorData[index++] = l;
+        colorData[index++] = a;
       }
     }
 
     const newX = viewOffsetX;
     const tileSizeValue = tileSize.value;
 
-    renderPixels(colors, newX, WorldWidth, tileSizeValue);
+    renderPixels(colorData, newX, WorldWidth, tileSizeValue);
 
     lastNow = now;
 
