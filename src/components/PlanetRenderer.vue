@@ -2,14 +2,12 @@
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useGameState, pixels} from "@/gameState";
 import {WATER_MAX_POLLUTION, WorldHeight, WorldWidth} from "@/utils/constants";
-import {useGridController} from "@/gridController";
 import {toCssHslColor} from "@/utils/toCssColor";
 import {useGameInputController} from "@/utils/useGameInputController";
 import {useViewOffset} from "@/utils/useViewOffset";
-import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
 import {useCursor} from "@/useCursor";
 import {useViewFilter} from "@/utils/useViewFilter";
-import {useTileColor} from "@/utils/tileColor";
+import {getTileColor} from "@/utils/tileColor";
 import {useTileSize} from "@/utils/useTileSize";
 import {useCanvas} from "@/utils/useCanvas";
 import {LayerItems} from "@/utils/transformers";
@@ -18,14 +16,11 @@ import {RedPixels} from "@/engine/RedPixels.js";
 const gameState = useGameState();
 
 const running = ref(true);
-const gridController = useGridController();
 const cursor = useCursor();
 const canvasRef = useCanvas();
 const gameInput = useGameInputController({target: canvasRef});
 const viewOffset = useViewOffset();
-const horizontalRotateAction = useHorizontalRotateAction();
 const viewFilter = useViewFilter();
-const {getTileColor} = useTileColor();
 const {tileSize} = useTileSize();
 
 const css = computed(() => ({
@@ -62,11 +57,16 @@ onMounted(() => {
 
     const hoveringTile = cursor.hoveringTile.value;
 
+    const humidity = gameState.info.humidity;
+
     startRender();
 
     const showPollution = viewFilter.pollutionView.value;
     const showPipes = cursor.holdingItem.value === 'pipe' || viewFilter.pipeView.value;
     const showTunnels = cursor.holdingItem.value === 'tunnel';
+
+    const heightMapOn = viewFilter.heightMap.value;
+    const variationTurnedOn = viewFilter.pixelVariation.value;
 
     // TODO:
     // 1. Optimize colors array - can it be done with a fixed array instead of a linked list?
@@ -77,7 +77,7 @@ onMounted(() => {
 
     for (const pixel of pixels) {
 
-      const [h1, s1, l1, a1] = lighten(color(pixel, gameState.info), hoveringTile === pixel ? 1.4 : 1);
+      const [h1, s1, l1, a1] = lighten(color(pixel, humidity, variationTurnedOn, heightMapOn), hoveringTile === pixel ? 1.4 : 1);
       colors.push(h1, s1, l1, a1);
 
       // 1
@@ -178,9 +178,9 @@ onMounted(() => {
     return [h, Math.min(s, s * (1 + ((factor - 1) / 2))), Math.min(100, l * factor), a];
   }
 
-  function color(pixel, worldInfo) {
-    const shadowFactor = viewFilter.heightMap.value ? (((pixel.height) / 10) * .2) + .8 : 1;
-    return darken(getTileColor(pixel, worldInfo), shadowFactor);
+  function color(pixel, humidity, variationTurnedOn, heightMapOn) {
+    const shadowFactor = heightMapOn ? (((pixel.height) / 10) * .2) + .8 : 1;
+    return darken(getTileColor(pixel, humidity, variationTurnedOn, heightMapOn), shadowFactor);
   }
 
   function addPollution([h, s, l, a], pixel) {
