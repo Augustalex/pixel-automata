@@ -1,7 +1,7 @@
 import {WorldWidth} from "@/utils/constants";
 import {useViewOffset} from "@/utils/useViewOffset";
 import {ref} from "vue";
-import {useGameState} from "@/gameState";
+import {pixels} from "@/gameState";
 import {useGridController} from "@/gridController";
 import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
 import {useTileSize} from "@/utils/useTileSize";
@@ -10,7 +10,6 @@ let mouseMoving = ref(null);
 const scrollTime = 3000;
 
 export function useGameInputController({target}) {
-    const gameState = useGameState();
     const gridController = useGridController();
     const viewOffset = useViewOffset();
     const keysDown = new Set();
@@ -84,7 +83,7 @@ export function useGameInputController({target}) {
         const offsetY = Math.floor(e.offsetY / tileSize.value);
 
         if (offsetX !== lastX.value || offsetY !== lastY.value) {
-            const tileAtPosition = gameState.pixels.find(p => {
+            const tileAtPosition = pixels.find(p => {
                 return p.position.x === offsetX && p.position.y === offsetY;
             });
             lastTile.value = tileAtPosition || null;

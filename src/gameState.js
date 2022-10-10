@@ -16,13 +16,15 @@ const SPEEDS = {
 const _simulationSpeed = ref(SPEEDS.normal);
 const _simulation = ref(null);
 
+export const pixels = GenerateWorld(WorldWidth, WorldHeight);
+
 const _gameClock = ref(0);
 const _state = reactive({
     worldData: {
         width: WorldWidth, height: WorldHeight,
     }, info: {
         averageTemperature: 0, humidity: 0,
-    }, pixels: GenerateWorld(WorldWidth, WorldHeight)
+    }
 });
 
 export const useGlobalGameClock = () => {
@@ -85,7 +87,7 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
                 _gameClock.value += delta;
 
                 if (systemCountdown <= 0) {
-                    const moduleProps = {now: gameClock.value, delta, pixels: _state.pixels};
+                    const moduleProps = {now: gameClock.value, delta, pixels};
 
                     const runningModule = modules.find(m => !m.alwaysRun && m.running());
                     if (!runningModule) {

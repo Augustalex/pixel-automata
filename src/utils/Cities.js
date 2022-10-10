@@ -1,17 +1,16 @@
-import {useGameClock, useGameState} from "@/gameState";
+import {pixels, useGameClock} from "@/gameState";
 import {computed} from "vue";
 
 let _cacheByClockTime = null;
 
 export function useCities() {
-    const state = useGameState();
     const time = useGameClock();
 
     return computed(() => {
         if (_cacheByClockTime && _cacheByClockTime[0] === time.value) return _cacheByClockTime[1];
 
         const tilesByCityId = new Map();
-        for (const pixel of state.pixels) {
+        for (const pixel of pixels) {
             if (pixel.pixelType === 'city') {
                 const currentCities = tilesByCityId.get(pixel.cityId) || [];
                 currentCities.push(pixel);

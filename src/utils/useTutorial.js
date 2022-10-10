@@ -1,5 +1,5 @@
 import {FarmHumidityThreshold} from "@/utils/useDrawerState";
-import {useGameState} from "@/gameState";
+import {useGameState, pixels} from "@/gameState";
 import {computed, ref, watch} from "vue";
 
 const canBuildFarmDone = ref(false);
@@ -19,7 +19,7 @@ export function useTutorial() {
         canBuildCity: () => {
             if (canBuildCityDone.value) return true;
             else {
-                canBuildCityDone.value = gameState.pixels.some(p => p.pixelType === 'farm');
+                canBuildCityDone.value = pixels.some(p => p.pixelType === 'farm');
                 return canBuildCityDone.value;
             }
         }

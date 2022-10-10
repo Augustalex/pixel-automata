@@ -1,6 +1,6 @@
 <script setup>
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import {useGameState} from "@/gameState";
+import {useGameState, pixels} from "@/gameState";
 import {WATER_MAX_POLLUTION, WorldHeight, WorldWidth} from "@/utils/constants";
 import {useGridController} from "@/gridController";
 import {toCssHslColor} from "@/utils/toCssColor";
@@ -75,7 +75,7 @@ onMounted(() => {
 
     const colors = [];
 
-    for (const pixel of gameState.pixels) {
+    for (const pixel of pixels) {
 
       const [h1, s1, l1, a1] = lighten(color(pixel, gameState.info), hoveringTile === pixel ? 1.4 : 1);
       colors.push(h1, s1, l1, a1);
