@@ -12,7 +12,6 @@ export function useViewOffset() {
     return {
         get,
         set,
-        worldLength,
         update
     };
 
@@ -41,7 +40,7 @@ export function useViewOffset() {
                 viewOffset.value = (newOffset < 0 ? worldLength() + newOffset : newOffset);
             }
         } else if (rotateAction.autoRotate.value) {
-            viewOffset.value = (viewOffset.value + (1 * delta)) % worldLength();
+            viewOffset.value = (viewOffset.value + 12 * delta) % worldLength();
         }
     }
 }

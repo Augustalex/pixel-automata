@@ -1,6 +1,8 @@
 "use strict";
 
 const vertexShaderSource = `#version 300 es
+  precision highp float;
+
   in vec2 a_position;
   in vec4 color;
   
@@ -21,20 +23,15 @@ const vertexShaderSource = `#version 300 es
     float fY = float(y);
     float fWorldSize = float(worldSize);
     
-    float offsetX = fX + screenOffset;
+    float offsetX = fX + (screenOffset / tileSize);
     float boundedOffsetX = offsetX < 0.0 ? offsetX + fWorldSize : offsetX > fWorldSize ? offsetX - fWorldSize : offsetX;
     vec2 newOffset = vec2(boundedOffsetX - 1.0, fY) * tileSize;
     
     vec2 rect = a_position * vec2(tileSize, tileSize);
     vec2 actualPosition = rect + newOffset; 
     
-    vec2 zeroToOne = actualPosition / u_resolution;
-    // convert from 0->1 to 0->2
-    vec2 zeroToTwo = zeroToOne * 2.0;
-    // convert from 0->2 to -1->+1 (clip space)
-    vec2 clipSpace = zeroToTwo - 1.0;
-    
-    gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+    vec2 clipSpace = 2.0 * (actualPosition / u_resolution) - 1.0;
+    gl_Position = vec4(clipSpace * vec2(1.0, -1.0), 0.0, 1.0);
     
     v_color = color;
   }

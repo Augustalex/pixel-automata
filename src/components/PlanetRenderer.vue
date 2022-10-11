@@ -68,7 +68,7 @@ onMounted(() => {
     startRender();
 
     const tileSizeValue = tileSize.value;
-    const viewOffsetX = viewOffset.get().value / tileSizeValue;
+    const viewOffsetX = viewOffset.get().value;
     const hoveringTile = cursor.hoveringTile.value;
     const humidity = gameState.info.humidity;
     const showPollution = viewFilter.pollutionView.value;
