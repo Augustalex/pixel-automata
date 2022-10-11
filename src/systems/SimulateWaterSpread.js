@@ -11,13 +11,19 @@ export function SimulateWaterSpread() {
     let hasWater = false;
     let running = false;
 
+    const systemRunDelay = .25;
+    let systemDelta = 0;
+
     return {
         run,
         running: () => running,
         alwaysRun: true
     };
 
-    function run({pixels}) {
+    function run({pixels, delta}) {
+        systemDelta += delta;
+        if (systemDelta < systemRunDelay) return;
+        systemDelta = 0;
 
         const toMakeWater = [];
         const waterLevel = Math.round(gameState.info.humidity * 10) - 1;

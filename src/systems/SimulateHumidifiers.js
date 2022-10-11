@@ -12,7 +12,6 @@ export function SimulateHumidifiers() {
 
     let hasAnnouncedFarmableMars = false;
     let running = false;
-    let lastRunTime = gameClock.value;
 
     return {
         run,
@@ -20,20 +19,18 @@ export function SimulateHumidifiers() {
         alwaysRun: true
     };
 
-    function run({now, pixels}) {
-        const delta = (now - lastRunTime);
-
+    function run({now, delta, pixels}) {
         let hasAnyHumidifier = false;
         let humidity = 0;
         for (let pixel of pixels) {
             if (pixel.pixelType === 'humidifier') {
                 hasAnyHumidifier = true;
 
-                if (pixel.radius > 7) {
+                if (pixel.radius > 12) {
                     transform(pixel, 'grass');
                 } else {
                     pixel.readyMeter += delta;
-                    if (pixel.readyMeter >= 2) {
+                    if (pixel.readyMeter >= .7) {
                         pixel.radius += 2;
                         pixel.readyMeter = 0;
                         const sands = view.getNeighboursCircular(pixel, pixel.radius, p => p.pixelType === 'sand');

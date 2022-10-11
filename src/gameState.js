@@ -40,7 +40,7 @@ window.fpsCounter = () => {
         if (frameTimeBuffer.length === 0) return;
 
         const cycleTime = frameTimeBuffer.reduce((acc, v) => acc + v, 0) / frameTimeBuffer.length;
-        console.log(1000 / cycleTime);
+        console.log(1 / cycleTime);
     }, 800);
 }
 
@@ -53,12 +53,15 @@ export function useSimulation() {
 export function Simulation({modules} = {modules: DefaultModules()}) {
     const gameClock = useGlobalGameClock();
     let systemIndex = 0;
-    let systemCountdown = 0;
-
-    let startedMainLoop = false;
 
     return {
-        start, stop, isRunning, speeds: SPEEDS, getSpeed, setSpeed
+        run,
+        stop,
+        start,
+        isRunning,
+        speeds: SPEEDS,
+        getSpeed,
+        setSpeed
     };
 
     function getSpeed() {
@@ -69,60 +72,37 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
         _simulationSpeed.value = speedValue;
     }
 
-    function start() {
-        setSpeed(SPEEDS.normal)
+    function run(delta) {
+        if (_simulationSpeed.value !== SPEEDS.paused) {
+            const scaledDelta = delta * _simulationSpeed.value;
+            _gameClock.value += scaledDelta;
 
-        if (startedMainLoop) return;
-        startedMainLoop = true;
+            const moduleProps = {now: gameClock.value, delta: scaledDelta, pixels};
 
-        let previousActualTime = Date.now();
-
-        const loop = () => {
-            if (_simulationSpeed.value !== SPEEDS.paused) {
-                const start = performance.now();
-
-                const currentActualTime = Date.now();
-                const actualDelta = currentActualTime - previousActualTime;
-                const delta = (actualDelta / 1000) * _simulationSpeed.value;
-                _gameClock.value += delta;
-
-                if (systemCountdown <= 0) {
-                    const moduleProps = {now: gameClock.value, delta, pixels};
-
-                    const runningModule = modules.find(m => !m.alwaysRun && m.running());
-                    if (!runningModule) {
-                        systemIndex += 1;
-                        if (systemIndex >= modules.length) {
-                            systemIndex = 0;
-                        }
-                    }
-                    modules[systemIndex].run(moduleProps);
-
-                    for (let alwaysRunModule of modules.filter(m => m.alwaysRun)) {
-                        alwaysRunModule.run(moduleProps)
-                    }
-
-                    systemCountdown = 250 / _simulationSpeed.value;
-                } else {
-                    systemCountdown -= actualDelta;
+            const runningModule = modules.find(m => !m.alwaysRun && m.running());
+            if (!runningModule) {
+                systemIndex += 1;
+                if (systemIndex >= modules.length) {
+                    systemIndex = 0;
                 }
+            }
+            modules[systemIndex].run(moduleProps);
 
-
-                frameTimeBuffer.push(performance.now() - start);
-
-                if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
-
-                previousActualTime = currentActualTime;
+            for (let alwaysRunModule of modules.filter(m => m.alwaysRun)) {
+                alwaysRunModule.run(moduleProps)
             }
 
-            requestAnimationFrame(loop);
-        };
-
-        loop();
+            frameTimeBuffer.push(delta);
+            if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
+        }
     }
 
     function stop() {
         setSpeed(SPEEDS.paused);
+    }
+
+    function start() {
+        setSpeed(SPEEDS.normal);
     }
 
     function isRunning() {

@@ -1,6 +1,6 @@
 <script setup>
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import {useGameState, pixels} from "@/gameState";
+import {useGameState, pixels, useSimulation} from "@/gameState";
 import {WATER_MAX_POLLUTION, WorldHeight, WorldWidth} from "@/utils/constants";
 import {toCssHslColor} from "@/utils/toCssColor";
 import {useGameInputController} from "@/utils/useGameInputController";
@@ -22,6 +22,7 @@ const gameInput = useGameInputController({target: canvasRef});
 const viewOffset = useViewOffset();
 const viewFilter = useViewFilter();
 const {tileSize} = useTileSize();
+const simulation = useSimulation();
 
 const css = computed(() => ({
   width: `${WorldWidth * tileSize.value}px`,
@@ -59,6 +60,7 @@ onMounted(() => {
     const delta = (now - lastNow) / 1000;
 
     // UPDATE DATA
+    simulation.value.run(delta);
     gameInput.update({now, delta});
     viewOffset.update({now, delta});
 
