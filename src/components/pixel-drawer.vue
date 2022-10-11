@@ -4,11 +4,17 @@ import {computed} from "vue";
 import {useGameState} from "@/gameState";
 import {useDrawerState} from "@/utils/useDrawerState";
 import TechButton from "@/components/tech-button";
+import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
 
 const gameState = useGameState();
 const drawerState = useDrawerState();
+const rotateAction = useHorizontalRotateAction();
 
-const tools = computed(() => drawerState.tools.value)
+const tools = computed(() => drawerState.tools.value);
+
+function toggleRotate() {
+  rotateAction.toggleAutoRotate();
+}
 </script>
 
 <template>
@@ -23,6 +29,9 @@ const tools = computed(() => drawerState.tools.value)
           class="drawer-icon"
           @dragstart.prevent
       />
+      <button :class="['quick-setting', 'icon-hoverEffect', {'quick-setting--on': rotateAction.autoRotate.value}]" @click="toggleRotate">
+        ROTATE {{ rotateAction.autoRotate.value ? 'ON' : 'OFF' }}
+      </button>
     </div>
   </div>
 </template>
@@ -45,10 +54,37 @@ const tools = computed(() => drawerState.tools.value)
 .drawer {
   padding: 90px;
   margin: -90px;
-
 }
 
 .drawer-icon {
   user-select: none;
+}
+
+button.quick-setting {
+  font-size: inherit;
+  width: 8em;
+  height: 3em;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  background: transparent;
+  color: rgba(255,255,255,.3);
+  cursor: pointer;
+  border: 0;
+  outline: 0;
+  font-family: "VCR";
+  text-align: center;
+
+  &:hover {
+    background: hsl(0, 0, 26);
+    color: rgba(255,255,255,1);
+  }
+}
+
+button.quick-setting--on:hover {
+    background: hsl(0, 0, 40);
+    color: rgba(255,255,255,1);
 }
 </style>

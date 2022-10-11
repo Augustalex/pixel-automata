@@ -44,18 +44,7 @@ export function useViewOffset() {
                 viewOffset.value = (newOffset < 0 ? worldLength() + newOffset : newOffset);
             }
         } else if (rotateAction.autoRotate.value) {
-            const xFromMiddle = mousePosition.x - (window.innerWidth * .5);
-            const yFromMiddle = mousePosition.y - (window.innerHeight * .5);
-            const distanceFromCenter = Math.sqrt(Math.pow(xFromMiddle, 2) + Math.pow(yFromMiddle, 2));
-
-            const maxDistance = canvas.value.offsetWidth * .5;
-            const minDistance = canvas.value.offsetWidth * .35;
-
-            if(distanceFromCenter > minDistance) {
-                const force = Math.max(0, Math.min(1, (Math.abs(xFromMiddle) - minDistance) / (maxDistance - minDistance)));
-                const direction = xFromMiddle > 0 ? -1 : 1;
-                viewOffset.value = (viewOffset.value + force * 200 * delta * direction) % worldLength();
-            }
+            viewOffset.value = (viewOffset.value + 16 * delta) % worldLength();
         }
     }
 }
