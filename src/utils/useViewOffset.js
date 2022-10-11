@@ -2,12 +2,16 @@ import {ref} from "vue";
 import {WorldWidth} from "@/utils/constants";
 import {useHorizontalRotateAction} from "@/utils/useHorizontalRotateAction";
 import {useTileSize} from "@/utils/useTileSize";
+import {useMousePosition} from "@/useMousePosition";
+import {useCanvas} from "@/utils/useCanvas";
 
 const viewOffset = ref(0);
 
 export function useViewOffset() {
     const rotateAction = useHorizontalRotateAction();
     const {tileSize} = useTileSize();
+    const mousePosition = useMousePosition();
+    const canvas = useCanvas();
 
     return {
         get,
@@ -40,7 +44,18 @@ export function useViewOffset() {
                 viewOffset.value = (newOffset < 0 ? worldLength() + newOffset : newOffset);
             }
         } else if (rotateAction.autoRotate.value) {
-            viewOffset.value = (viewOffset.value + 12 * delta) % worldLength();
+            const xFromMiddle = mousePosition.x - (window.innerWidth * .5);
+            const yFromMiddle = mousePosition.y - (window.innerHeight * .5);
+            const distanceFromCenter = Math.sqrt(Math.pow(xFromMiddle, 2) + Math.pow(yFromMiddle, 2));
+
+            const maxDistance = canvas.value.offsetWidth * .5;
+            const minDistance = canvas.value.offsetWidth * .35;
+
+            if(distanceFromCenter > minDistance) {
+                const force = Math.max(0, Math.min(1, (Math.abs(xFromMiddle) - minDistance) / (maxDistance - minDistance)));
+                const direction = xFromMiddle > 0 ? -1 : 1;
+                viewOffset.value = (viewOffset.value + force * 200 * delta * direction) % worldLength();
+            }
         }
     }
 }
