@@ -4,6 +4,7 @@ import {transform} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 import {isFarm} from "@/utils/farmUtils";
 import {WATER_MAX_POLLUTION} from "@/utils/constants";
+import {useSystemDelta} from "@/utils/SystemDelta";
 
 export const FireThreshold = 4;
 
@@ -32,9 +33,7 @@ export function SimulatePollution(
     const gameState = useGameState();
     const view = PixelDataView();
     const notifications = useNotifications();
-
-    let running = false;
-
+    const systemDelta = useSystemDelta(.25);
     let pollutionWarningLevel = 0;
 
     // reset on each run
@@ -43,10 +42,13 @@ export function SimulatePollution(
     let delta = 0;
 
     return {
-        run, running: () => running, alwaysRun: true
+        run,
+        systemDelta,
     };
 
     function run({pixels, delta: _delta}) {
+        systemDelta.resetSystemDelta();
+
         totalHeat = 0;
         count = 0;
         delta = _delta;

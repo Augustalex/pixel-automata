@@ -4,17 +4,17 @@ import {fromGrassToCity, LayerItems} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 import {isFarm, isMushroomsFarm} from "@/utils/farmUtils";
 import {Tech, useTechTree} from "@/utils/useTechTree";
+import {useSystemDelta} from "@/utils/SystemDelta";
 
 export function SimulateCities() {
     const view = PixelDataView();
     const time = useGameClock();
     const notifications = useNotifications();
     const techTree = useTechTree();
+    const systemDelta = useSystemDelta(.25);
 
-    let nextRun = 0;
     let iterationId = 'a';
     let loopCount = 0;
-    let running = false;
     let lastComplainedAboutFood = 0;
 
     const farmCountByRoadNetwork = new Map();
@@ -22,13 +22,12 @@ export function SimulateCities() {
 
     return {
         run,
-        running: () => running
+        running: () => false,
+        systemDelta
     };
 
-    function run({delta, now, pixels}) {
-        running = true;
-        // if (time.value < nextRun) return;
-        // nextRun = time.value + 1;
+    function run({pixels}) {
+        systemDelta.resetSystemDelta();
 
         if (loopCount >= 3) {
             loopCount = 0;
@@ -36,7 +35,8 @@ export function SimulateCities() {
             if (iterationId === 'a') {
                 farmCountByRoadNetwork.clear();
                 cityTilesByCityId.clear();
-                running = false;
+
+                systemDelta.resetSystemDelta();
             }
         }
 

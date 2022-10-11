@@ -4,12 +4,10 @@ import {useTechTree} from "@/utils/useTechTree";
 export function ResearchSystem() {
     const techTree = useTechTree();
     const notifications = useNotifications();
-    let running = false;
 
     return {
         run,
-        running: () => running,
-        alwaysRun: true,
+        systemDelta: null,
     };
 
     function run({delta}) {
@@ -22,7 +20,7 @@ export function ResearchSystem() {
         for (let branch of branches) {
             branch.value = branch.value.map(tech => {
                 if (tech.researching) {
-                    tech.researchProgress += delta * 1000;
+                    tech.researchProgress += delta * 10;
                     if (tech.researchProgress > tech.researchTime) {
                         tech.researched = true;
                         tech.researching = false;

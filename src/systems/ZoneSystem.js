@@ -3,12 +3,11 @@ import {useNotifications} from "@/utils/useNotifications";
 
 export function ZoneSystem() {
     const notifications = useNotifications();
-    let running = false;
     let hasMadeFirstCity = false;
 
     return {
         run,
-        running: () => running
+        systemDelta: null,
     };
 
     function run({delta, pixels}) {

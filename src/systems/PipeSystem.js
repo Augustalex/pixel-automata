@@ -1,28 +1,29 @@
 import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {LayerItems} from "@/utils/transformers";
 import {WATER_MAX_POLLUTION} from "@/utils/constants";
+import {useSystemDelta} from "@/utils/SystemDelta";
 
 const DEFAULT_CONFIG = {
     DRAW_RATE: .1,
     WATER_MAX_POLLUTION: WATER_MAX_POLLUTION
 };
 
-export function PipeSystem({
-                               DRAW_RATE,
-                               WATER_MAX_POLLUTION
-                           } = DEFAULT_CONFIG) {
+export function PipeSystem(
+    {
+        DRAW_RATE,
+        WATER_MAX_POLLUTION
+    } = DEFAULT_CONFIG
+) {
     const view = PixelDataView();
-
-    const running = false;
+    const systemDelta = useSystemDelta(.25);
 
     return {
         run,
-        running: () => running,
-        alwaysRun: true
+        systemDelta
     };
 
-    function run({delta, pixels}) {
-        const toPollute = [];
+    function run({pixels}) {
+        systemDelta.resetSystemDelta();
 
         const MAX_PIPE_CAPACITY = 10;
 

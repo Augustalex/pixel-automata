@@ -3,23 +3,21 @@ import {useGameClock, useGameState} from "@/gameState";
 import {transform} from "@/utils/transformers";
 import {FarmHumidityThreshold} from "@/utils/useDrawerState";
 import {useNotifications} from "@/utils/useNotifications";
+import {useSystemDelta} from "@/utils/SystemDelta";
 
 export function SimulateHumidifiers() {
-    const gameClock = useGameClock();
     const gameState = useGameState();
     const view = PixelDataView();
     const notifications = useNotifications();
 
     let hasAnnouncedFarmableMars = false;
-    let running = false;
 
     return {
         run,
-        running: () => running,
-        alwaysRun: true
+        systemDelta: null
     };
 
-    function run({now, delta, pixels}) {
+    function run({delta, pixels}) {
         let hasAnyHumidifier = false;
         let humidity = 0;
         for (let pixel of pixels) {

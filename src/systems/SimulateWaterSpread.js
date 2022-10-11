@@ -2,28 +2,23 @@ import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {useGameState} from "@/gameState";
 import {getTransformer} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
+import {useSystemDelta} from "@/utils/SystemDelta";
 
 export function SimulateWaterSpread() {
     const gameState = useGameState();
     const view = PixelDataView();
     const notifications = useNotifications()
+    const systemDelta = useSystemDelta(.25);
 
     let hasWater = false;
-    let running = false;
-
-    const systemRunDelay = .25;
-    let systemDelta = 0;
 
     return {
         run,
-        running: () => running,
-        alwaysRun: true
+        systemDelta,
     };
 
-    function run({pixels, delta}) {
-        systemDelta += delta;
-        if (systemDelta < systemRunDelay) return;
-        systemDelta = 0;
+    function run({pixels}) {
+        systemDelta.resetSystemDelta();
 
         const toMakeWater = [];
         const waterLevel = calculateSeaLevel(gameState.info.humidity);

@@ -1,5 +1,6 @@
 import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {useGameClock} from "@/gameState";
+import {useSystemDelta} from "@/utils/SystemDelta";
 // Ported from Stefan Gustavson's java implementation
 // http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
 // Read Stefan's excellent paper for details on how this code works.
@@ -334,22 +335,17 @@ export function SimulateStreams() {
     let offset = {x: -10000, y: 10000};
     const speedScale = 2;
     const time = useGameClock();
+    const systemDelta = useSystemDelta(.25);
 
     let flow = {x: 0, y: 0};
-    let running = false;
-
-    let count = 0;
 
     return {
         run,
-        running: () => running,
-        alwaysRun: true,
+        systemDelta,
     };
 
     function run({delta, pixels}) {
-        count += delta;
-        if (count < .25) return;
-        count = 0;
+        systemDelta.resetSystemDelta();
 
         const steps = 10;
 

@@ -2,20 +2,23 @@ import {PixelDataView} from "@/utils/pixelDataView/PixelDataView";
 import {transform} from "@/utils/transformers";
 import {useNotifications} from "@/utils/useNotifications";
 import {FarmType, isFarm, isGrainsFarm, isMushroomsFarm} from "@/utils/farmUtils";
+import {useSystemDelta} from "@/utils/SystemDelta";
 
 export function SimulateFarms() {
     const view = PixelDataView();
     const notifications = useNotifications();
 
     let builtFirstFarm = false;
-    const running = false;
+
+    const systemDelta = useSystemDelta(.25);
 
     return {
         run,
-        running: () => running
+        systemDelta,
     };
 
-    function run({delta, pixels}) {
+    function run({pixels}) {
+        systemDelta.resetSystemDelta();
 
         for (let pixel of pixels) {
             if (isFarm(pixel)) {

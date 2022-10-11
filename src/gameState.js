@@ -73,28 +73,25 @@ export function Simulation({modules} = {modules: DefaultModules()}) {
     }
 
     function run(delta) {
-        if (_simulationSpeed.value !== SPEEDS.paused) {
-            const scaledDelta = delta * _simulationSpeed.value;
-            _gameClock.value += scaledDelta;
+        if (_simulationSpeed.value === SPEEDS.paused) return;
 
-            const moduleProps = {now: gameClock.value, delta: scaledDelta, pixels};
+        const scaledDelta = delta * _simulationSpeed.value;
+        _gameClock.value += scaledDelta;
+        const moduleProps = {now: gameClock.value, delta: scaledDelta, pixels};
 
-            const runningModule = modules.find(m => !m.alwaysRun && m.running());
-            if (!runningModule) {
-                systemIndex += 1;
-                if (systemIndex >= modules.length) {
-                    systemIndex = 0;
+        for (const module of modules) {
+            if (module.systemDelta) {
+                module.systemDelta.updateSystemDelta(scaledDelta);
+                if (module.systemDelta.canRunThisFrame()) {
+                    module.run(moduleProps);
                 }
+            } else {
+                module.run(moduleProps);
             }
-            modules[systemIndex].run(moduleProps);
-
-            for (let alwaysRunModule of modules.filter(m => m.alwaysRun)) {
-                alwaysRunModule.run(moduleProps)
-            }
-
-            frameTimeBuffer.push(delta);
-            if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
         }
+
+        frameTimeBuffer.push(delta);
+        if (frameTimeBuffer.length > 100) frameTimeBuffer.shift();
     }
 
     function stop() {
