@@ -26,7 +26,7 @@ export function SimulateWaterSpread() {
         systemDelta = 0;
 
         const toMakeWater = [];
-        const waterLevel = Math.round(gameState.info.humidity * 10) - 1;
+        const waterLevel = calculateSeaLevel(gameState.info.humidity);
         for (let pixel of pixels) {
             if (pixel.pixelType !== 'water') {
                 if (pixel.height <= waterLevel) {
@@ -49,4 +49,12 @@ export function SimulateWaterSpread() {
             }
         }
     }
+}
+
+export function calculateSeaLevel(humidity) {
+    return Math.round(easeOutExpo(humidity) * 6 - 1);
+}
+
+function easeOutExpo(x) {
+    return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
 }

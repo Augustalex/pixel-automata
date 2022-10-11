@@ -4,12 +4,13 @@ import {computed} from "vue";
 import {useGameState} from "@/gameState";
 import {useCities} from "@/utils/Cities";
 import {FireThreshold} from "@/systems/SimulatePolution";
+import {calculateSeaLevel} from "@/systems/SimulateWaterSpread";
 
 const gameState = useGameState();
 const cities = useCities();
 
-const humidity = computed(() => {
-  return Math.round(gameState.info.humidity * 100);
+const seaLevel = computed(() => {
+  return gameState.info.humidity === 0 ? '0%' : `${calculateSeaLevel(gameState.info.humidity) * 10}%`;
 });
 const heat = computed(() => {
   return Math.round(((gameState.info.averageTemperature - 1) / (FireThreshold - 1)) * 100);
@@ -23,7 +24,7 @@ const population = computed(() => {
   <div class="info">
     <div class="textContainer">
       <h1>POLLUTION<br>{{ heat }}%</h1>
-      <h1>HUMIDITY<br>{{ humidity }}%</h1>
+      <h1>SEA LEVEL<br>{{ seaLevel }}</h1>
       <h1>POPULATION<br>{{ population }}</h1>
     </div>
   </div>
