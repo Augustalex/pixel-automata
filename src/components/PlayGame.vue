@@ -11,6 +11,7 @@ import {useTileSize} from "@/utils/useTileSize";
 import TechTree from "@/components/TechTree";
 import PixelInfo from "@/components/PixelInfo";
 import PartyChoice from "@/components/PartyChoice.vue";
+import PixelWaitingIndicator from "@/components/PixelWaitingIndicator";
 
 const gameState = useGameState();
 const mousePosition = useMousePosition();
@@ -114,6 +115,7 @@ const css = computed(() => ({
   <info-bar/>
   <tech-tree/>
   <pixel-info />
+  <pixel-waiting-indicator />
 </template>
 
 <style lang="scss" scoped>

@@ -111,9 +111,9 @@ const text = computed(() => {
   background: rgba(0, 0, 0, .4);
   font-family: sans-serif;
   color: white;
-  padding: 4px;
+  padding: 4px 4px 4px 8px;
   font-size: 1.2em;
-  margin: 6px 0 0 10px;
+  margin: 6px 0 0 12px;
 
   text-align: left;
 }

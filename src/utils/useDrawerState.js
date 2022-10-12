@@ -14,17 +14,26 @@ export function useDrawerState() {
     const techTree = useTechTree();
     const tutorial = useTutorial();
 
+    const _tools = computed(() => getTools());
+
     return {
-        tools: computed(() => getTools()),
+        tools: _tools,
         toolsUsedInfo,
-        toolUsed
+        toolUsed,
+        toolInfo,
     };
+
+    function toolInfo(toolTitle) {
+        return _tools.value.find(t => t.title === toolTitle);
+    }
 
     function toolUsed(toolTitle) {
         const infos = toolsUsedInfo.value;
         const allTools = getTools(true);
         const cooldownTime = allTools.find(t => t.title === toolTitle).cooldownTime;
         infos[toolTitle] = gameClock.value + cooldownTime;
+
+        toolsUsedInfo.value = {...toolsUsedInfo.value}; // Shallow copy to trigger Vue reactive system
     }
 
     function getTools(showAll = false) {
@@ -38,7 +47,7 @@ export function useDrawerState() {
                 title: 'humidifier',
                 displayTitle: 'Humidifier',
                 cooldownUntil: cooldownInfos['humidifier'] || 0,
-                cooldownTime: 1.3,
+                cooldownTime: 2,
             }
         ];
 
@@ -71,7 +80,7 @@ export function useDrawerState() {
                     title: FarmType.Grain,
                     displayTitle: 'Farm',
                     cooldownUntil: cooldownInfos[FarmType.Grain] || 0,
-                    cooldownTime: .5,
+                    cooldownTime: 1,
                 })
             if (techTree.isResearched(Tech.Mushrooms, techTree.Branches.Farming))
                 items.push(
@@ -79,7 +88,7 @@ export function useDrawerState() {
                         title: FarmType.Mushrooms,
                         displayTitle: 'Farm - Mushrooms',
                         cooldownUntil: cooldownInfos[FarmType.Mushrooms] || 0,
-                        cooldownTime: 60,
+                        cooldownTime: 30,
                     }
                 )
         }
@@ -90,7 +99,7 @@ export function useDrawerState() {
                         title: 'zone-city',
                         displayTitle: 'City',
                         cooldownUntil: cooldownInfos['zone-city'] || 0,
-                        cooldownTime: 60,
+                        cooldownTime: 180,
                     },
                     {
                         title: 'road',
