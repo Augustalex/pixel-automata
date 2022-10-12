@@ -70,7 +70,7 @@ button.quick-setting {
   align-items: center;
 
   background: transparent;
-  color: rgba(255,255,255,.3);
+  color: rgba(255,255,255,.5);
   cursor: pointer;
   border: 0;
   outline: 0;

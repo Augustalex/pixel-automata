@@ -1,23 +1,23 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed} from "vue";
 import {toCssHslColor} from "@/utils/toCssColor";
-import {iconColor} from "@/utils/iconColor";
 import {useCursor} from "@/useCursor";
-import {useGlobalGameClock} from "@/gameState";
 import {useTechTree} from "@/utils/useTechTree";
 
 const cursor = useCursor();
-const gameClock = useGlobalGameClock();
 const techTree = useTechTree();
 
-const progress = ref(1);
+const researchProgressOrNull = computed(() => {
+  const research = techTree.ongoingResearch();
+  if(!research) return null;
 
-const cooldown = computed(() => Math.max(0, Math.min(1, 0)));
+  const progress = research.researchProgress / research.researchTime;
+  return Math.round(progress * 100);
+});
 
 const css = computed(() => {
   return ({
     background: toCssHslColor([230, 55, 65, 1]),
-    right: `${100 - Math.round((1 - cooldown.value) * 100)}%`,
   });
 });
 
@@ -29,7 +29,8 @@ function onClick() {
 <template>
   <div class="icon icon-hoverEffect" @click="onClick">
     <div class="icon-background"/>
-    <span class="icon-text">TECH</span>
+    <span v-if="!!researchProgressOrNull" class="icon-text">{{researchProgressOrNull}}%</span>
+    <span v-else class="icon-text">TECH</span>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -62,7 +63,7 @@ function onClick() {
   top: 0;
   bottom: 0;
   left: 0;
-  right: v-bind('css.right');
+  right: 0;
   z-index: 0;
 }
 

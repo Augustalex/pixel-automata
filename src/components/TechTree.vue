@@ -10,9 +10,7 @@ const terraTech = computed(() => techTree.terraTech.value);
 const urbanTech = computed(() => techTree.urbanTech.value);
 const farmingTech = computed(() => techTree.farmingTech.value);
 const anythingResearching = computed(() => {
-  return terraTech.value.some(t => t.researching) ||
-      urbanTech.value.some(t => t.researching) ||
-      farmingTech.value.some(t => t.researching);
+  return !!techTree.ongoingResearch();
 })
 const Branches = computed(() => techTree.Branches);
 

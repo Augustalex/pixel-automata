@@ -15,26 +15,26 @@ export const Tech = {
 const _techTreeVisible = ref(false);
 const _terraTech = ref([
     {title: Tech.Humidifier, researched: true, researchTime: 5},
-    {title: Tech.RaiseLand, researched: false, researchTime: 10},
+    {title: Tech.RaiseLand, researched: false, researchTime: 30},
     {
         title: Tech.Dig,
-        researched: false, researchTime: 20
+        researched: false, researchTime: 60
     },
 ]);
 const _urbanTech = ref([
     {title: Tech.HousingPods, researched: true, researchTime: 5},
     {
         title: Tech.Pipes,
-        researched: false, researchTime: 10
+        researched: false, researchTime: 180
     },
-    {title: Tech.CityDomes, researched: false, researchTime: 20},
-    {title: Tech.UndergroundHighway, researched: false, researchTime: 30}
+    {title: Tech.CityDomes, researched: false, researchTime: 180},
+    {title: Tech.UndergroundHighway, researched: false, researchTime: 180 * 2}
 ]);
 const _farmingTech = ref([
     {title: Tech.Grains, researched: true, researchTime: 5},
     {
         title: Tech.Mushrooms,
-        researched: false, researchTime: 20
+        researched: false, researchTime: 180
     },
 ]);
 const Terra = 'Terra';
@@ -55,6 +55,7 @@ export function useTechTree() {
             Urban,
             Farming
         },
+        ongoingResearch,
         getBranch,
         research,
         isResearched
@@ -62,6 +63,12 @@ export function useTechTree() {
 
     function isResearched(tech, branchName) {
         return getBranch(branchName).value.find(t => t.title === tech).researched;
+    }
+
+    function ongoingResearch() {
+        return _terraTech.value.find(t => t.researching) ??
+            _urbanTech.value.find(t => t.researching) ??
+            _farmingTech.value.find(t => t.researching);
     }
 
     function getBranch(branch) {

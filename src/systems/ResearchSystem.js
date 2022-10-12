@@ -18,17 +18,23 @@ export function ResearchSystem() {
         ];
 
         for (let branch of branches) {
-            branch.value = branch.value.map(tech => {
+            let changed = false;
+            for (const tech of branch.value) {
                 if (tech.researching) {
-                    tech.researchProgress += delta * 10;
+                    changed = true;
+
+                    tech.researchProgress += delta;
                     if (tech.researchProgress > tech.researchTime) {
                         tech.researched = true;
                         tech.researching = false;
                         delete tech.researchProgress;
                     }
                 }
-                return tech;
-            });
+            }
+
+            if(changed) {
+                branch.value = [...branch.value]; // Shallow copy to trigger Vue reactive system
+            }
         }
     }
 }
