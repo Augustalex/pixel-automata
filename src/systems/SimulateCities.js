@@ -103,13 +103,11 @@ export function SimulateCities() {
                         roadsIds.add(newRoadId);
                     }
                 }
-                console.log('roadsIds',roadsIds);
                 let totalFarms = 0;
 
                 for (let roadId of roadsIds) {
                     totalFarms += (farmCountByRoadNetwork.get(roadId) || 0);
                 }
-                // console.log('roadsIds', roadsIds, 'farmCountByRoadNetwork',farmCountByRoadNetwork, 'totalFarms',totalFarms);
 
                 const farmCount = totalFarms;
 
@@ -129,7 +127,6 @@ export function SimulateCities() {
                     }
                 } else if (farmCount > farmRequirement + 1) {
                     // Grow city
-                    console.log('GROW CITY', farmCount, farmRequirement + 1, 'totalFarms', totalFarms, 'roadIds', roadsIds);
                     const randomTiles = cityTiles.slice();
                     shuffleArray(randomTiles);
 

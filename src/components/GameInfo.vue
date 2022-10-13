@@ -16,8 +16,14 @@ const heat = computed(() => {
   return Math.round(((gameState.info.averageTemperature - 1) / (FireThreshold - 1)) * 100);
 });
 const population = computed(() => {
-  const cityData = cities.value.get('city-1');
-  return cityData ? cityData.population : 0;
+  let total = 0;
+  for (let [_, cityData] of cities.value) {
+    if(cityData) {
+      total += cityData.population;
+    }
+  }
+
+  return total;
 });
 </script>
 <template>
