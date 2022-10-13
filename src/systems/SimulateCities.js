@@ -97,17 +97,25 @@ export function SimulateCities() {
                 const roadsIds = new Set();
                 for (let cityTile of cityTiles) {
                     farmRequirement += farmRequirementByCityLevel(cityTile);
-                    roadsIds.add(...view.getNeighbours(cityTile, 12, isRoad).map(p => p.roadId));
+                    const nearbyRoads = view.getNeighbours(cityTile, 3, isRoad);
+                    const newRoadIds = nearbyRoads.map(p => p.roadId).filter(id => !!id);
+                    for (let newRoadId of newRoadIds) {
+                        roadsIds.add(newRoadId);
+                    }
                 }
-
+                console.log('roadsIds',roadsIds);
                 let totalFarms = 0;
+
                 for (let roadId of roadsIds) {
                     totalFarms += (farmCountByRoadNetwork.get(roadId) || 0);
                 }
+                // console.log('roadsIds', roadsIds, 'farmCountByRoadNetwork',farmCountByRoadNetwork, 'totalFarms',totalFarms);
 
                 const farmCount = totalFarms;
 
                 if (farmCount < farmRequirement) {
+                    // Shrink city?
+
                     let tally = 0;
                     for (let t of cityTiles) {
                         tally += 1;
@@ -120,6 +128,8 @@ export function SimulateCities() {
                         }
                     }
                 } else if (farmCount > farmRequirement + 1) {
+                    // Grow city
+                    console.log('GROW CITY', farmCount, farmRequirement + 1, 'totalFarms', totalFarms, 'roadIds', roadsIds);
                     const randomTiles = cityTiles.slice();
                     shuffleArray(randomTiles);
 
@@ -163,7 +173,7 @@ export function SimulateCities() {
                 road.roadId = roadId;
             }
 
-            const nearbyRoads = view.getNeighbours(road, 5, isRoad);
+            const nearbyRoads = view.getNeighbours(road, 3, isRoad);
             for (let nextRoad of nearbyRoads) {
                 if (nextRoad.roadId && nextRoad.roadId.startsWith(iterationId)) {
                     continue;

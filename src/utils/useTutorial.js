@@ -1,6 +1,7 @@
 import {FarmHumidityThreshold} from "@/utils/useDrawerState";
 import {useGameState, pixels} from "@/gameState";
 import {computed, ref, watch} from "vue";
+import {calculateSeaLevel} from "@/systems/SimulateWaterSpread";
 
 const canBuildFarmDone = ref(false);
 const canBuildCityDone = ref(false);
@@ -12,7 +13,8 @@ export function useTutorial() {
         canBuildFarm: () => {
             if (canBuildFarmDone.value) return true;
             else {
-                canBuildFarmDone.value = gameState.info.humidity > FarmHumidityThreshold;
+                const seaLevel = calculateSeaLevel(gameState.info.humidity);
+                canBuildFarmDone.value = seaLevel >= FarmHumidityThreshold;
                 return canBuildFarmDone.value;
             }
         },

@@ -61,7 +61,6 @@ export function PipeSystem(
                             }
 
                             const newNeed = Math.min(MAX_PIPE_CAPACITY, Math.max(0, WATER_MAX_POLLUTION - pixel.pollution.level));
-                            console.log('NEW NEED', newNeed);
                             pixel.layer1.pollutionNeed = newNeed;
                         }
                     }

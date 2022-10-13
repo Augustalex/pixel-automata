@@ -138,7 +138,8 @@ function fromGrassToCity(pixel) {
 
 function fromZoneToCity(pixel) {
     pixel.pixelType = 'city';
-    pixel.cityId = `city-1`;
+    // pixel.cityId = `city-1`;
+    pixel.cityId = `city-${Math.round(Math.random() * 9999)}${pixel.position.x}${pixel.position.y}`;
     pixel.variation = Math.round(Math.random() * 10);
     pixel.cityLevel = 0;
 }

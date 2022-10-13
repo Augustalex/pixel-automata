@@ -4,7 +4,7 @@ import {FarmType} from "@/utils/farmUtils";
 import {Tech, useTechTree} from "@/utils/useTechTree";
 import {useTutorial} from "@/utils/useTutorial";
 
-export const FarmHumidityThreshold = .15;
+export const FarmHumidityThreshold = 2;
 
 const toolsUsedInfo = ref({});
 

@@ -69,7 +69,6 @@ onMounted(() => {
   const canvasValue = canvas.value;
   canvasValue.width = 120;
   canvasValue.height = 120;
-  console.log(canvasValue);
 
   const loop = () => {
     const context = canvasValue.getContext('2d');
